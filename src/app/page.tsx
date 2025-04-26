@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -5,19 +6,30 @@ import type { EventDetails } from '@/services/event-management';
 import { getEventDetails } from '@/services/event-management';
 import EventCard from '@/components/event-card';
 import EventDetailsModal from '@/components/event-details-modal';
-// Use Bot icon for Robot, keep others
-import { Bot, Atom, Puzzle, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus } from 'lucide-react';
+// Updated imports for new icons
+import { Bot, Atom, Puzzle, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 
 
+// Expanded events list with year 2025
 const eventsList = [
-  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Oct 10-12, 2024', location: 'North Campus Grounds' },
-  // Use Bot icon for ROBOMAP
-  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Nov 5, 2024', location: 'Engineering Dept.' },
-  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 20, 2024', location: 'Physics Dept.' },
-  { name: 'BITBOTS', shortDescription: 'Coding & Gaming Event', icon: <Puzzle className="w-8 h-8" />, date: 'Dec 1, 2024', location: 'Computer Science Dept.' },
+  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Oct 10-12, 2025', location: 'North Campus Grounds' },
+  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Nov 5, 2025', location: 'Engineering Dept.' },
+  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 20, 2025', location: 'Physics Dept.' },
+  { name: 'BITBOTS', shortDescription: 'Coding & Gaming', icon: <Code className="w-8 h-8" />, date: 'Dec 1, 2025', location: 'Computer Science Dept.' },
+  { name: 'LitVerse', shortDescription: 'Literature Festival', icon: <BookOpen className="w-8 h-8" />, date: 'Jan 15-16, 2025', location: 'Arts Faculty Hall' },
+  { name: 'Canvas Clash', shortDescription: 'Art Competition', icon: <Brush className="w-8 h-8" />, date: 'Feb 1, 2025', location: 'Fine Arts Dept.' },
+  { name: 'ShutterFest', shortDescription: 'Photography Contest', icon: <Camera className="w-8 h-8" />, date: 'Feb 18, 2025', location: 'Campus Lawns' },
+  { name: 'HackathonX', shortDescription: '24hr Coding Challenge', icon: <Code className="w-8 h-8" />, date: 'Mar 5-6, 2025', location: 'CIC Building' },
+  { name: 'Reel Life', shortDescription: 'Short Film Festival', icon: <Film className="w-8 h-8" />, date: 'Mar 20, 2025', location: 'SRCC Auditorium' },
+  { name: 'ChemFusion', shortDescription: 'Chemistry Symposium', icon: <FlaskConical className="w-8 h-8" />, date: 'Apr 2, 2025', location: 'Chemistry Dept.' },
+  { name: 'Debate League', shortDescription: 'Inter-College Debate', icon: <Mic className="w-8 h-8" />, date: 'Apr 15, 2025', location: 'Conference Centre' },
+  { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 1, 2025', location: 'Amphitheatre' },
+  { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 10, 2025', location: 'University Guest House' },
+  { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 5, 2025', location: 'Sports Complex' },
+  { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 22, 2025', location: 'Convention Hall' },
 ];
 
 export default function Home() {
@@ -81,9 +93,9 @@ export default function Home() {
         <p className="text-lg text-muted-foreground">Discover and register for exciting events at Delhi University.</p>
       </header>
 
-      <section className="w-full max-w-6xl">
-        <h2 className="text-2xl sm:text-3xl font-semibold mb-8 text-center text-foreground">Upcoming Events</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
+      <section className="w-full max-w-7xl"> {/* Increased max-width for more cards */}
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-8 text-center text-foreground">Upcoming Events - 2025</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 justify-items-center"> {/* Adjusted grid columns */}
           {eventsList.map((event) => (
             <EventCard
               key={event.name}

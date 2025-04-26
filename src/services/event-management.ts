@@ -1,3 +1,4 @@
+
 /**
  * Represents the details of an event.
  */
@@ -34,49 +35,155 @@ export interface EventDetails {
 // In a real app, this would be a database or API call.
 const mockEvents: Record<string, EventDetails> = {
   THOMDOS: {
-    id: 'thomdos-2024',
+    id: 'thomdos-2025',
     name: 'THOMDOS',
     description: 'The annual cultural and technical festival of Delhi University. Featuring competitions, workshops, performances, and more!',
-    dateTime: '2024-10-10T10:00:00Z', // Use ISO format
+    dateTime: '2025-10-10T10:00:00Z', // Updated year
     location: 'North Campus Grounds',
     capacity: 500,
     registeredAttendees: 250,
   },
   ROBOMAP: {
-    id: 'robomap-2024',
+    id: 'robomap-2025',
     name: 'ROBOMAP',
     description: 'Witness the clash of titans in the ultimate robotics competition. Build, program, and compete!',
-    dateTime: '2024-11-05T09:30:00Z',
+    dateTime: '2025-11-05T09:30:00Z', // Updated year
     location: 'Engineering Department Labs',
     capacity: 100,
     registeredAttendees: 98, // Close to capacity
   },
   COSMIC: {
-    id: 'cosmic-2024',
+    id: 'cosmic-2025',
     name: 'COSMIC',
     description: 'Explore the wonders of the universe in this hands-on astronomy workshop. Telescope viewings included!',
-    dateTime: '2024-11-20T18:00:00Z',
+    dateTime: '2025-11-20T18:00:00Z', // Updated year
     location: 'Physics Department Auditorium',
     capacity: 150,
     registeredAttendees: 75,
   },
   BITBOTS: {
-    id: 'bitbots-2024',
+    id: 'bitbots-2025',
     name: 'BITBOTS',
     description: 'A fusion of competitive coding challenges and exciting e-sports tournaments. Code, game, conquer!',
-    dateTime: '2024-12-01T11:00:00Z',
+    dateTime: '2025-12-01T11:00:00Z', // Updated year
     location: 'Computer Science Department Hub',
     capacity: 200,
     registeredAttendees: 200, // At capacity
   },
+  // --- Added Events ---
+  LitVerse: {
+    id: 'litverse-2025',
+    name: 'LitVerse',
+    description: 'Celebrate the written word with author talks, poetry slams, and book discussions.',
+    dateTime: '2025-01-15T10:00:00Z',
+    location: 'Arts Faculty Hall',
+    capacity: 250,
+    registeredAttendees: 110,
+  },
+  'Canvas Clash': { // Use quotes for names with spaces
+    id: 'canvas-clash-2025',
+    name: 'Canvas Clash',
+    description: 'Unleash your creativity in a live painting and sketching competition.',
+    dateTime: '2025-02-01T13:00:00Z',
+    location: 'Fine Arts Dept. Courtyard',
+    capacity: 80,
+    registeredAttendees: 35,
+  },
+  ShutterFest: {
+    id: 'shutterfest-2025',
+    name: 'ShutterFest',
+    description: 'Capture the essence of DU through your lens. Photography competition and exhibition.',
+    dateTime: '2025-02-18T09:00:00Z',
+    location: 'Campus Lawns & Various Locations',
+    capacity: 120,
+    registeredAttendees: 90,
+  },
+  HackathonX: {
+    id: 'hackathonx-2025',
+    name: 'HackathonX',
+    description: 'A 24-hour coding marathon to build innovative solutions. Prizes and glory await!',
+    dateTime: '2025-03-05T17:00:00Z', // Start time
+    location: 'Cluster Innovation Centre (CIC)',
+    capacity: 150,
+    registeredAttendees: 145, // Almost full
+  },
+  'Reel Life': {
+    id: 'reel-life-2025',
+    name: 'Reel Life',
+    description: 'Showcase your filmmaking talent. Short film screening and awards.',
+    dateTime: '2025-03-20T16:00:00Z',
+    location: 'SRCC Auditorium',
+    capacity: 400,
+    registeredAttendees: 280,
+  },
+  ChemFusion: {
+    id: 'chemfusion-2025',
+    name: 'ChemFusion',
+    description: 'A symposium exploring the latest advancements in chemical sciences. Guest lectures and paper presentations.',
+    dateTime: '2025-04-02T10:30:00Z',
+    location: 'Chemistry Department Lecture Hall',
+    capacity: 180,
+    registeredAttendees: 60,
+  },
+  'Debate League': {
+    id: 'debate-league-2025',
+    name: 'Debate League',
+    description: 'Witness sharp minds battle with words in the final rounds of the Inter-College Debate League.',
+    dateTime: '2025-04-15T14:00:00Z',
+    location: 'Conference Centre',
+    capacity: 300,
+    registeredAttendees: 210,
+  },
+  'Melody Night': {
+    id: 'melody-night-2025',
+    name: 'Melody Night',
+    description: 'An enchanting evening featuring performances by university bands and solo artists.',
+    dateTime: '2025-05-01T18:30:00Z',
+    location: 'University Amphitheatre',
+    capacity: 1000,
+    registeredAttendees: 650,
+  },
+  'Alumni Meet': {
+    id: 'alumni-meet-2025',
+    name: 'Alumni Meet',
+    description: 'Connect with fellow graduates, network, and relive your campus memories.',
+    dateTime: '2025-06-10T17:00:00Z',
+    location: 'University Guest House Lawns',
+    capacity: 400,
+    registeredAttendees: 150,
+  },
+  'Career Fair': {
+    id: 'career-fair-2025',
+    name: 'Career Fair',
+    description: 'Explore job and internship opportunities from leading companies across various sectors.',
+    dateTime: '2025-07-05T10:00:00Z',
+    location: 'Multipurpose Hall, Sports Complex',
+    capacity: 2000, // Larger capacity
+    registeredAttendees: 900,
+  },
+  'Innovation Expo': {
+    id: 'innovation-expo-2025',
+    name: 'Innovation Expo',
+    description: 'Discover groundbreaking projects and startups by DU students and faculty.',
+    dateTime: '2025-08-22T11:00:00Z',
+    location: 'Convention Hall',
+    capacity: 600,
+    registeredAttendees: 320,
+  },
 };
 
-const registeredEmails: Record<string, Set<string>> = {
-    'thomdos-2024': new Set(['test@example.com']),
-    'robomap-2024': new Set(),
-    'cosmic-2024': new Set(),
-    'bitbots-2024': new Set(['full@example.com']), // Add some emails to simulate full
-};
+// Initialize registeredEmails for all events
+const registeredEmails: Record<string, Set<string>> = {};
+Object.values(mockEvents).forEach(event => {
+    registeredEmails[event.id] = new Set();
+});
+
+// Add some pre-registered emails for testing
+registeredEmails['thomdos-2025'].add('test@example.com');
+registeredEmails['bitbots-2025'].add('full@example.com');
+// Add a few more for variety
+registeredEmails['litverse-2025'].add('reader@example.com');
+registeredEmails['hackathonx-2025'].add('coder@example.com');
 
 
 // --- Mock API Functions ---
@@ -89,7 +196,8 @@ const registeredEmails: Record<string, Set<string>> = {
 export async function getEventDetails(eventName: string): Promise<EventDetails> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const event = mockEvents[eventName];
+      // Find event case-insensitively or handle names with spaces correctly
+      const event = mockEvents[eventName] || Object.values(mockEvents).find(e => e.name === eventName);
       if (event) {
         // Return a copy to prevent direct modification of the mock store
         resolve({ ...event });
@@ -109,7 +217,9 @@ export async function getEventDetails(eventName: string): Promise<EventDetails> 
 export async function registerForEvent(eventName: string, userEmail: string): Promise<boolean> {
    return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const event = mockEvents[eventName];
+        // Find event case-insensitively or handle names with spaces correctly
+        const event = mockEvents[eventName] || Object.values(mockEvents).find(e => e.name === eventName);
+
         if (!event) {
           console.error(`Attempted to register for non-existent event: ${eventName}`);
           return resolve(false); // Or reject(new Error(...))
@@ -117,7 +227,7 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
 
         const eventId = event.id;
         if (!registeredEmails[eventId]) {
-            registeredEmails[eventId] = new Set(); // Initialize if not present
+            registeredEmails[eventId] = new Set(); // Initialize if not present (should be initialized above, but safety check)
         }
 
         // Check for capacity
@@ -126,16 +236,28 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
           return resolve(false);
         }
 
-        // Check for duplicate registration
-        if (registeredEmails[eventId].has(userEmail)) {
+        // Check for duplicate registration (case-insensitive email check)
+        const normalizedEmail = userEmail.toLowerCase();
+        let isDuplicate = false;
+        registeredEmails[eventId].forEach(existingEmail => {
+            if (existingEmail.toLowerCase() === normalizedEmail) {
+                isDuplicate = true;
+            }
+        });
+
+        if (isDuplicate) {
           console.log(`Registration failed for ${userEmail} to ${eventName}: Already registered.`);
           return resolve(false);
         }
 
+
         // Simulate successful registration
-        registeredEmails[eventId].add(userEmail);
-        mockEvents[eventName].registeredAttendees += 1; // IMPORTANT: Update the count
-        console.log(`Successfully registered ${userEmail} for ${eventName}. New count: ${mockEvents[eventName].registeredAttendees}`);
+        registeredEmails[eventId].add(userEmail); // Store original case email
+        // Safely update the event in the mock store
+        const updatedEvent = { ...event, registeredAttendees: event.registeredAttendees + 1 };
+        mockEvents[event.name] = updatedEvent; // Update using the original key
+
+        console.log(`Successfully registered ${userEmail} for ${eventName}. New count: ${updatedEvent.registeredAttendees}`);
         resolve(true);
 
       }, 700); // Simulate network delay & processing
