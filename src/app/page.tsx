@@ -5,7 +5,7 @@ import type { EventDetails } from '@/services/event-management';
 import { getEventDetails } from '@/services/event-management';
 import EventCard from '@/components/event-card';
 import EventDetailsModal from '@/components/event-details-modal';
-// Import Bot instead of Robot, Atom, Puzzle, Activity, Ticket from lucide-react
+// Use Bot icon for Robot, keep others
 import { Bot, Atom, Puzzle, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
@@ -59,7 +59,12 @@ export default function Home() {
         } catch (error) {
             console.error("Failed to refresh event details:", error);
         } finally {
-            setIsLoadingDetails(false); // Hide loading state
+             // Only stop loading if the modal is still considered open conceptually
+             // This check prevents setting loading to false if the modal was closed
+             // *during* the fetch request.
+             if (isModalOpen && selectedEventDetails?.name) {
+                setIsLoadingDetails(false);
+             }
         }
       };
       refreshDetails();
@@ -100,7 +105,7 @@ export default function Home() {
       />
        {/* Conditional Skeleton loading state inside a Dialog */}
        {isModalOpen && isLoadingDetails && (
-           <Dialog open={true} onOpenChange={onClose}> {/* Use onClose from parent */}
+           <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
                 <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
                      <DialogHeader>
                         <Skeleton className="h-8 w-3/4 mb-2" />
