@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerForEvent } from "@/services/event-management";
-import { Mail } from 'lucide-react';
+import { Mail, Ticket } from 'lucide-react'; // Added Ticket icon
 
 const formSchema = z.object({
   email: z.string().email({
@@ -26,7 +26,8 @@ const formSchema = z.object({
 
 interface RegistrationFormProps {
   eventName: string;
-  onRegistrationSuccess: () => void;
+  // Update prop type to accept email on success
+  onRegistrationSuccess: (email: string) => void;
 }
 
 const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistrationSuccess }) => {
@@ -44,16 +45,17 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
       if (success) {
         toast({
           title: "Registration Successful!",
-          description: `You're registered for ${eventName}. Your ticket is confirmed.`,
+          description: `Your ticket for ${eventName} is confirmed.`,
           variant: "default", // or "success" if you add a success variant
         });
-        form.reset();
-        onRegistrationSuccess(); // Call the callback on success
+        // Call the callback *before* resetting the form to pass the email
+        onRegistrationSuccess(values.email);
+        form.reset(); // Reset form after successful registration and callback
       } else {
-        // Assuming the service returns false for duplicate or other errors
+        // Assuming the service returns false for duplicate or other errors like capacity
         toast({
           title: "Registration Failed",
-          description: "This email is already registered or registration failed.",
+          description: "This email may already be registered, the event might be full, or registration failed.",
           variant: "destructive",
         });
       }
@@ -87,7 +89,11 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
           )}
         />
         <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? 'Registering...' : 'Register & Confirm Ticket'}
+           {form.formState.isSubmitting ? 'Registering...' : (
+             <>
+               <Ticket className="mr-2 h-4 w-4" /> Register & Confirm Ticket
+             </>
+           )}
         </Button>
       </form>
     </Form>
@@ -95,4 +101,3 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
 };
 
 export default RegistrationForm;
-
