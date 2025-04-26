@@ -34,7 +34,7 @@ export interface EventDetails {
 // --- Mock Data Store ---
 // In a real app, this would be a database or API call.
 const mockEvents: Record<string, EventDetails> = {
-  // --- Events Before June 2025 (Unchanged Dates) ---
+  // --- Events Before May 2025 (Marked as full/past) ---
   LitVerse: {
     id: 'litverse-2025',
     name: 'LitVerse',
@@ -42,7 +42,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-01-15T10:00:00Z',
     location: 'Arts Faculty Hall',
     capacity: 250,
-    registeredAttendees: 110,
+    registeredAttendees: 250, // Mark as full since it's past
   },
   'Canvas Clash': { // Use quotes for names with spaces
     id: 'canvas-clash-2025',
@@ -51,7 +51,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-02-01T13:00:00Z',
     location: 'Fine Arts Dept. Courtyard',
     capacity: 80,
-    registeredAttendees: 35,
+    registeredAttendees: 80, // Mark as full since it's past
   },
   ShutterFest: {
     id: 'shutterfest-2025',
@@ -60,7 +60,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-02-18T09:00:00Z',
     location: 'Campus Lawns & Various Locations',
     capacity: 120,
-    registeredAttendees: 90,
+    registeredAttendees: 120, // Mark as full since it's past
   },
   HackathonX: {
     id: 'hackathonx-2025',
@@ -69,7 +69,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-03-05T17:00:00Z', // Start time
     location: 'Cluster Innovation Centre (CIC)',
     capacity: 150,
-    registeredAttendees: 145, // Almost full
+    registeredAttendees: 150, // Mark as full since it's past
   },
   'Reel Life': {
     id: 'reel-life-2025',
@@ -78,7 +78,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-03-20T16:00:00Z',
     location: 'SRCC Auditorium',
     capacity: 400,
-    registeredAttendees: 280,
+    registeredAttendees: 400, // Mark as full since it's past
   },
   ChemFusion: {
     id: 'chemfusion-2025',
@@ -87,7 +87,7 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-04-02T10:30:00Z',
     location: 'Chemistry Department Lecture Hall',
     capacity: 180,
-    registeredAttendees: 60,
+    registeredAttendees: 180, // Mark as full since it's past
   },
   'Debate League': {
     id: 'debate-league-2025',
@@ -96,8 +96,10 @@ const mockEvents: Record<string, EventDetails> = {
     dateTime: '2025-04-15T14:00:00Z',
     location: 'Conference Centre',
     capacity: 300,
-    registeredAttendees: 210,
+    registeredAttendees: 300, // Mark as full since it's past
   },
+
+  // --- Events from May 2025 onwards (Original Attendee Counts) ---
   'Melody Night': {
     id: 'melody-night-2025',
     name: 'Melody Night',
@@ -107,8 +109,6 @@ const mockEvents: Record<string, EventDetails> = {
     capacity: 1000,
     registeredAttendees: 650,
   },
-
-  // --- Updated Dates for June - December 2025 ---
   'Alumni Meet': {
     id: 'alumni-meet-2025',
     name: 'Alumni Meet',
@@ -179,15 +179,17 @@ const mockEvents: Record<string, EventDetails> = {
 const registeredEmails: Record<string, Set<string>> = {};
 Object.values(mockEvents).forEach(event => {
     registeredEmails[event.id] = new Set();
+    // Pre-populate emails for past events to match the capacity (simulates they were full)
+    if (new Date(event.dateTime) < new Date('2025-05-01T00:00:00Z')) {
+        for(let i = 0; i < event.capacity; i++) {
+            registeredEmails[event.id].add(`past-attendee-${i}@example.com`);
+        }
+    }
 });
 
-// Add some pre-registered emails for testing
+// Add some specific pre-registered emails for testing upcoming events
 registeredEmails['thomdos-2025'].add('test@example.com');
-registeredEmails['bitbots-2025'].add('full@example.com');
-// Add a few more for variety
-registeredEmails['litverse-2025'].add('reader@example.com');
-registeredEmails['hackathonx-2025'].add('coder@example.com');
-
+// Bitbots is already at capacity from the data definition
 
 // --- Mock API Functions ---
 
@@ -215,7 +217,7 @@ export async function getEventDetails(eventName: string): Promise<EventDetails> 
  * Simulates registering a user for an event with checks.
  * @param eventName The name of the event.
  * @param userEmail The user's email.
- * @returns Promise resolving to true on success, false on failure (duplicate/full).
+ * @returns Promise resolving to true on success, false on failure (past/duplicate/full).
  */
 export async function registerForEvent(eventName: string, userEmail: string): Promise<boolean> {
    return new Promise((resolve, reject) => {
@@ -228,12 +230,21 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
           return resolve(false); // Or reject(new Error(...))
         }
 
+        // --- Check if event is past ---
+        const eventDate = new Date(event.dateTime);
+        const cutoffDate = new Date('2025-05-01T00:00:00Z'); // May 1st, 2025
+        if (eventDate < cutoffDate) {
+            console.log(`Registration failed for ${userEmail} to ${eventName}: Event date has passed.`);
+            return resolve(false);
+        }
+        // --- End Past Event Check ---
+
         const eventId = event.id;
         if (!registeredEmails[eventId]) {
-            registeredEmails[eventId] = new Set(); // Initialize if not present (should be initialized above, but safety check)
+            registeredEmails[eventId] = new Set(); // Initialize if not present
         }
 
-        // Check for capacity
+        // Check for capacity (using the source data)
         if (event.registeredAttendees >= event.capacity) {
           console.log(`Registration failed for ${userEmail} to ${eventName}: Event full.`);
           return resolve(false);
@@ -257,7 +268,6 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
         // Simulate successful registration
         registeredEmails[eventId].add(userEmail); // Store original case email
         // Safely update the event in the mock store
-        // Find the key (original name) used in mockEvents to update it correctly
         const eventKey = Object.keys(mockEvents).find(key => mockEvents[key].id === eventId);
         if (eventKey) {
           const updatedEvent = { ...mockEvents[eventKey], registeredAttendees: mockEvents[eventKey].registeredAttendees + 1 };
@@ -265,7 +275,6 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
           console.log(`Successfully registered ${userEmail} for ${eventName}. New count: ${updatedEvent.registeredAttendees}`);
           resolve(true);
         } else {
-          // This case should theoretically not happen if event was found earlier
           console.error(`Could not find original key for event ID: ${eventId}`);
           resolve(false);
         }

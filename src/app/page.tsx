@@ -11,47 +11,81 @@ import { Bot, Atom, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, Boo
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 
 
 // Expanded events list with updated dates for June-December 2025
+// Added 'isPast' flag for events before May 2025
 const eventsList = [
-  // Events before June 2025 (remain unchanged)
-  { name: 'LitVerse', shortDescription: 'Literature Festival', icon: <BookOpen className="w-8 h-8" />, date: 'Jan 15-16, 2025', location: 'Arts Faculty Hall' },
-  { name: 'Canvas Clash', shortDescription: 'Art Competition', icon: <Brush className="w-8 h-8" />, date: 'Feb 1, 2025', location: 'Fine Arts Dept.' },
-  { name: 'ShutterFest', shortDescription: 'Photography Contest', icon: <Camera className="w-8 h-8" />, date: 'Feb 18, 2025', location: 'Campus Lawns' },
-  { name: 'HackathonX', shortDescription: '24hr Coding Challenge', icon: <Code className="w-8 h-8" />, date: 'Mar 5-6, 2025', location: 'CIC Building' },
-  { name: 'Reel Life', shortDescription: 'Short Film Festival', icon: <Film className="w-8 h-8" />, date: 'Mar 20, 2025', location: 'SRCC Auditorium' },
-  { name: 'ChemFusion', shortDescription: 'Chemistry Symposium', icon: <FlaskConical className="w-8 h-8" />, date: 'Apr 2, 2025', location: 'Chemistry Dept.' },
-  { name: 'Debate League', shortDescription: 'Inter-College Debate', icon: <Mic className="w-8 h-8" />, date: 'Apr 15, 2025', location: 'Conference Centre' },
-  { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 1, 2025', location: 'Amphitheatre' },
+  // Events before May 2025 (Marked as past)
+  { name: 'LitVerse', shortDescription: 'Literature Festival', icon: <BookOpen className="w-8 h-8" />, date: 'Jan 15-16, 2025', location: 'Arts Faculty Hall', isPast: true },
+  { name: 'Canvas Clash', shortDescription: 'Art Competition', icon: <Brush className="w-8 h-8" />, date: 'Feb 1, 2025', location: 'Fine Arts Dept.', isPast: true },
+  { name: 'ShutterFest', shortDescription: 'Photography Contest', icon: <Camera className="w-8 h-8" />, date: 'Feb 18, 2025', location: 'Campus Lawns', isPast: true },
+  { name: 'HackathonX', shortDescription: '24hr Coding Challenge', icon: <Code className="w-8 h-8" />, date: 'Mar 5-6, 2025', location: 'CIC Building', isPast: true },
+  { name: 'Reel Life', shortDescription: 'Short Film Festival', icon: <Film className="w-8 h-8" />, date: 'Mar 20, 2025', location: 'SRCC Auditorium', isPast: true },
+  { name: 'ChemFusion', shortDescription: 'Chemistry Symposium', icon: <FlaskConical className="w-8 h-8" />, date: 'Apr 2, 2025', location: 'Chemistry Dept.', isPast: true },
+  { name: 'Debate League', shortDescription: 'Inter-College Debate', icon: <Mic className="w-8 h-8" />, date: 'Apr 15, 2025', location: 'Conference Centre', isPast: true },
 
-  // Updated Dates for June-December 2025
-  { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 15, 2025', location: 'University Guest House' }, // Updated date
-  { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 10, 2025', location: 'Sports Complex' }, // Updated date
-  { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 28, 2025', location: 'Convention Hall' }, // Updated date
-  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Sep 12-14, 2025', location: 'North Campus Grounds' }, // Updated date
-  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Oct 8, 2025', location: 'Engineering Dept.' }, // Updated date
-  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 15, 2025', location: 'Physics Dept.' }, // Updated date
-  { name: 'BITBOTS', shortDescription: 'Coding & Gaming', icon: <Code className="w-8 h-8" />, date: 'Dec 5, 2025', location: 'Computer Science Dept.' }, // Updated date
+  // Events from May 2025 onwards (Not marked as past)
+  { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 1, 2025', location: 'Amphitheatre', isPast: false },
+  { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 15, 2025', location: 'University Guest House', isPast: false },
+  { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 10, 2025', location: 'Sports Complex', isPast: false },
+  { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 28, 2025', location: 'Convention Hall', isPast: false },
+  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Sep 12-14, 2025', location: 'North Campus Grounds', isPast: false },
+  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Oct 8, 2025', location: 'Engineering Dept.', isPast: false },
+  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 15, 2025', location: 'Physics Dept.', isPast: false },
+  { name: 'BITBOTS', shortDescription: 'Coding & Gaming', icon: <Code className="w-8 h-8" />, date: 'Dec 5, 2025', location: 'Computer Science Dept.', isPast: false },
 ];
 
 export default function Home() {
   const [selectedEventDetails, setSelectedEventDetails] = useState<EventDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const { toast } = useToast(); // Initialize toast
 
-  const handleRegisterClick = async (eventName: string) => {
+  const handleRegisterClick = async (eventName: string, isPast: boolean) => {
+    // Check if the event is marked as past based on the list
+    if (isPast) {
+      toast({
+        title: "Registration Closed",
+        description: `Registration for ${eventName} has ended as the event date has passed.`,
+        variant: "destructive",
+      });
+      return; // Don't proceed to open the modal
+    }
+
+    // If not past, proceed to fetch details and open modal
     setIsLoadingDetails(true);
     setIsModalOpen(true); // Open modal immediately to show loading state
     try {
       const details = await getEventDetails(eventName);
+      // Double-check the date from fetched details (more reliable)
+      const eventDate = new Date(details.dateTime);
+      const cutoffDate = new Date('2025-05-01T00:00:00Z'); // May 1st, 2025
+      if (eventDate < cutoffDate) {
+          toast({
+              title: "Registration Closed",
+              description: `Registration for ${eventName} has ended.`,
+              variant: "destructive",
+          });
+          setIsModalOpen(false); // Close modal if date check fails after fetch
+          setIsLoadingDetails(false);
+          return;
+      }
       setSelectedEventDetails(details);
     } catch (error) {
       console.error("Failed to fetch event details:", error);
-      // Optionally show an error toast
+      toast({
+         title: "Error",
+         description: "Could not fetch event details. Please try again.",
+         variant: "destructive",
+      });
       setIsModalOpen(false); // Close modal on error
     } finally {
-      setIsLoadingDetails(false);
+      // Only set loading to false if the modal wasn't closed due to error or past date check
+       if (isModalOpen) {
+         setIsLoadingDetails(false);
+       }
     }
   };
 
@@ -107,7 +141,8 @@ export default function Home() {
               date={event.date}
               location={event.location}
               icon={event.icon}
-              onRegisterClick={() => handleRegisterClick(event.name)}
+              isPast={event.isPast} // Pass the isPast flag
+              onRegisterClick={() => handleRegisterClick(event.name, event.isPast)} // Pass isPast to handler
             />
           ))}
         </div>
