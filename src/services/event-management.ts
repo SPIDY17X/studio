@@ -34,43 +34,7 @@ export interface EventDetails {
 // --- Mock Data Store ---
 // In a real app, this would be a database or API call.
 const mockEvents: Record<string, EventDetails> = {
-  THOMDOS: {
-    id: 'thomdos-2025',
-    name: 'THOMDOS',
-    description: 'The annual cultural and technical festival of Delhi University. Featuring competitions, workshops, performances, and more!',
-    dateTime: '2025-10-10T10:00:00Z', // Updated year
-    location: 'North Campus Grounds',
-    capacity: 500,
-    registeredAttendees: 250,
-  },
-  ROBOMAP: {
-    id: 'robomap-2025',
-    name: 'ROBOMAP',
-    description: 'Witness the clash of titans in the ultimate robotics competition. Build, program, and compete!',
-    dateTime: '2025-11-05T09:30:00Z', // Updated year
-    location: 'Engineering Department Labs',
-    capacity: 100,
-    registeredAttendees: 98, // Close to capacity
-  },
-  COSMIC: {
-    id: 'cosmic-2025',
-    name: 'COSMIC',
-    description: 'Explore the wonders of the universe in this hands-on astronomy workshop. Telescope viewings included!',
-    dateTime: '2025-11-20T18:00:00Z', // Updated year
-    location: 'Physics Department Auditorium',
-    capacity: 150,
-    registeredAttendees: 75,
-  },
-  BITBOTS: {
-    id: 'bitbots-2025',
-    name: 'BITBOTS',
-    description: 'A fusion of competitive coding challenges and exciting e-sports tournaments. Code, game, conquer!',
-    dateTime: '2025-12-01T11:00:00Z', // Updated year
-    location: 'Computer Science Department Hub',
-    capacity: 200,
-    registeredAttendees: 200, // At capacity
-  },
-  // --- Added Events ---
+  // --- Events Before June 2025 (Unchanged Dates) ---
   LitVerse: {
     id: 'litverse-2025',
     name: 'LitVerse',
@@ -143,11 +107,13 @@ const mockEvents: Record<string, EventDetails> = {
     capacity: 1000,
     registeredAttendees: 650,
   },
+
+  // --- Updated Dates for June - December 2025 ---
   'Alumni Meet': {
     id: 'alumni-meet-2025',
     name: 'Alumni Meet',
     description: 'Connect with fellow graduates, network, and relive your campus memories.',
-    dateTime: '2025-06-10T17:00:00Z',
+    dateTime: '2025-06-15T17:00:00Z', // Updated date
     location: 'University Guest House Lawns',
     capacity: 400,
     registeredAttendees: 150,
@@ -156,7 +122,7 @@ const mockEvents: Record<string, EventDetails> = {
     id: 'career-fair-2025',
     name: 'Career Fair',
     description: 'Explore job and internship opportunities from leading companies across various sectors.',
-    dateTime: '2025-07-05T10:00:00Z',
+    dateTime: '2025-07-10T10:00:00Z', // Updated date
     location: 'Multipurpose Hall, Sports Complex',
     capacity: 2000, // Larger capacity
     registeredAttendees: 900,
@@ -165,12 +131,49 @@ const mockEvents: Record<string, EventDetails> = {
     id: 'innovation-expo-2025',
     name: 'Innovation Expo',
     description: 'Discover groundbreaking projects and startups by DU students and faculty.',
-    dateTime: '2025-08-22T11:00:00Z',
+    dateTime: '2025-08-28T11:00:00Z', // Updated date
     location: 'Convention Hall',
     capacity: 600,
     registeredAttendees: 320,
   },
+  THOMDOS: {
+    id: 'thomdos-2025',
+    name: 'THOMDOS',
+    description: 'The annual cultural and technical festival of Delhi University. Featuring competitions, workshops, performances, and more!',
+    dateTime: '2025-09-12T10:00:00Z', // Updated date (Start of festival)
+    location: 'North Campus Grounds',
+    capacity: 500,
+    registeredAttendees: 250,
+  },
+  ROBOMAP: {
+    id: 'robomap-2025',
+    name: 'ROBOMAP',
+    description: 'Witness the clash of titans in the ultimate robotics competition. Build, program, and compete!',
+    dateTime: '2025-10-08T09:30:00Z', // Updated date
+    location: 'Engineering Department Labs',
+    capacity: 100,
+    registeredAttendees: 98, // Close to capacity
+  },
+  COSMIC: {
+    id: 'cosmic-2025',
+    name: 'COSMIC',
+    description: 'Explore the wonders of the universe in this hands-on astronomy workshop. Telescope viewings included!',
+    dateTime: '2025-11-15T18:00:00Z', // Updated date
+    location: 'Physics Department Auditorium',
+    capacity: 150,
+    registeredAttendees: 75,
+  },
+  BITBOTS: {
+    id: 'bitbots-2025',
+    name: 'BITBOTS',
+    description: 'A fusion of competitive coding challenges and exciting e-sports tournaments. Code, game, conquer!',
+    dateTime: '2025-12-05T11:00:00Z', // Updated date
+    location: 'Computer Science Department Hub',
+    capacity: 200,
+    registeredAttendees: 200, // At capacity
+  },
 };
+
 
 // Initialize registeredEmails for all events
 const registeredEmails: Record<string, Set<string>> = {};
@@ -254,11 +257,18 @@ export async function registerForEvent(eventName: string, userEmail: string): Pr
         // Simulate successful registration
         registeredEmails[eventId].add(userEmail); // Store original case email
         // Safely update the event in the mock store
-        const updatedEvent = { ...event, registeredAttendees: event.registeredAttendees + 1 };
-        mockEvents[event.name] = updatedEvent; // Update using the original key
-
-        console.log(`Successfully registered ${userEmail} for ${eventName}. New count: ${updatedEvent.registeredAttendees}`);
-        resolve(true);
+        // Find the key (original name) used in mockEvents to update it correctly
+        const eventKey = Object.keys(mockEvents).find(key => mockEvents[key].id === eventId);
+        if (eventKey) {
+          const updatedEvent = { ...mockEvents[eventKey], registeredAttendees: mockEvents[eventKey].registeredAttendees + 1 };
+          mockEvents[eventKey] = updatedEvent; // Update using the original key
+          console.log(`Successfully registered ${userEmail} for ${eventName}. New count: ${updatedEvent.registeredAttendees}`);
+          resolve(true);
+        } else {
+          // This case should theoretically not happen if event was found earlier
+          console.error(`Could not find original key for event ID: ${eventId}`);
+          resolve(false);
+        }
 
       }, 700); // Simulate network delay & processing
    });

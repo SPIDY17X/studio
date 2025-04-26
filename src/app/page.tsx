@@ -7,18 +7,15 @@ import { getEventDetails } from '@/services/event-management';
 import EventCard from '@/components/event-card';
 import EventDetailsModal from '@/components/event-details-modal';
 // Updated imports for new icons
-import { Bot, Atom, Puzzle, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb } from 'lucide-react';
+import { Bot, Atom, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb } from 'lucide-react'; // Removed Puzzle, added missing icons
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 
 
-// Expanded events list with year 2025
+// Expanded events list with updated dates for June-December 2025
 const eventsList = [
-  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Oct 10-12, 2025', location: 'North Campus Grounds' },
-  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Nov 5, 2025', location: 'Engineering Dept.' },
-  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 20, 2025', location: 'Physics Dept.' },
-  { name: 'BITBOTS', shortDescription: 'Coding & Gaming', icon: <Code className="w-8 h-8" />, date: 'Dec 1, 2025', location: 'Computer Science Dept.' },
+  // Events before June 2025 (remain unchanged)
   { name: 'LitVerse', shortDescription: 'Literature Festival', icon: <BookOpen className="w-8 h-8" />, date: 'Jan 15-16, 2025', location: 'Arts Faculty Hall' },
   { name: 'Canvas Clash', shortDescription: 'Art Competition', icon: <Brush className="w-8 h-8" />, date: 'Feb 1, 2025', location: 'Fine Arts Dept.' },
   { name: 'ShutterFest', shortDescription: 'Photography Contest', icon: <Camera className="w-8 h-8" />, date: 'Feb 18, 2025', location: 'Campus Lawns' },
@@ -27,9 +24,15 @@ const eventsList = [
   { name: 'ChemFusion', shortDescription: 'Chemistry Symposium', icon: <FlaskConical className="w-8 h-8" />, date: 'Apr 2, 2025', location: 'Chemistry Dept.' },
   { name: 'Debate League', shortDescription: 'Inter-College Debate', icon: <Mic className="w-8 h-8" />, date: 'Apr 15, 2025', location: 'Conference Centre' },
   { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 1, 2025', location: 'Amphitheatre' },
-  { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 10, 2025', location: 'University Guest House' },
-  { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 5, 2025', location: 'Sports Complex' },
-  { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 22, 2025', location: 'Convention Hall' },
+
+  // Updated Dates for June-December 2025
+  { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 15, 2025', location: 'University Guest House' }, // Updated date
+  { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 10, 2025', location: 'Sports Complex' }, // Updated date
+  { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 28, 2025', location: 'Convention Hall' }, // Updated date
+  { name: 'THOMDOS', shortDescription: 'Cultural & Tech Fest', icon: <Activity className="w-8 h-8" />, date: 'Sep 12-14, 2025', location: 'North Campus Grounds' }, // Updated date
+  { name: 'ROBOMAP', shortDescription: 'Robotics Competition', icon: <Bot className="w-8 h-8" />, date: 'Oct 8, 2025', location: 'Engineering Dept.' }, // Updated date
+  { name: 'COSMIC', shortDescription: 'Astronomy Workshop', icon: <Atom className="w-8 h-8" />, date: 'Nov 15, 2025', location: 'Physics Dept.' }, // Updated date
+  { name: 'BITBOTS', shortDescription: 'Coding & Gaming', icon: <Code className="w-8 h-8" />, date: 'Dec 5, 2025', location: 'Computer Science Dept.' }, // Updated date
 ];
 
 export default function Home() {
@@ -87,7 +90,7 @@ export default function Home() {
 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-6 sm:p-12 md:p-24 bg-gradient-to-b from-blue-50 via-background to-background">
+    <main className="flex min-h-screen flex-col items-center justify-start p-6 sm:p-12 md:p-24 bg-gradient-to-b from-blue-100 via-white to-teal-50"> {/* Updated background gradient */}
       <header className="w-full max-w-5xl mb-12 text-center">
         <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-2">DU Events Hub</h1>
         <p className="text-lg text-muted-foreground">Discover and register for exciting events at Delhi University.</p>
@@ -117,7 +120,7 @@ export default function Home() {
       />
        {/* Conditional Skeleton loading state inside a Dialog */}
        {isModalOpen && isLoadingDetails && (
-           <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
+            <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
                 <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
                      <DialogHeader>
                         <Skeleton className="h-8 w-3/4 mb-2" />
