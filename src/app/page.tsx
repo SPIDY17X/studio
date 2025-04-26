@@ -9,10 +9,10 @@ import EventDetailsModal from '@/components/event-details-modal';
 // Updated imports for new icons
 import { Bot, Atom, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb } from 'lucide-react'; // Removed Puzzle, added missing icons
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'; // Import DialogTitle
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast"; // Import useToast
-
+import { VisuallyHidden } from '@/components/ui/visually-hidden'; // Import VisuallyHidden
 
 // Expanded events list with updated dates for June-December 2025
 // Added 'isPast' flag for events before May 2025
@@ -158,9 +158,11 @@ export default function Home() {
             <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
                 <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
                      <DialogHeader>
-                        <Skeleton className="h-8 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-full" />
-                         <Skeleton className="h-4 w-5/6" />
+                        {/* Add a visually hidden DialogTitle for accessibility */}
+                        <DialogTitle><VisuallyHidden>Loading Event Details</VisuallyHidden></DialogTitle>
+                        <Skeleton className="h-8 w-3/4 mb-2" /> {/* Simulates Title */}
+                        <Skeleton className="h-4 w-full" />     {/* Simulates Description line 1 */}
+                        <Skeleton className="h-4 w-5/6" />    {/* Simulates Description line 2 */}
                      </DialogHeader>
                       <Separator className="bg-border/50 my-4" />
                       <div className="grid gap-4">
