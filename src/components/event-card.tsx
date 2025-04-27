@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 // Corrected import path if needed, but assuming lucide-react is correct based on page.tsx usage
 import { Ticket, CalendarDays, MapPin, Ban } from 'lucide-react'; // Added Ban icon
+import { cn } from '@/lib/utils'; // Import cn utility
 
 interface EventCardProps {
   eventName: string;
@@ -18,8 +19,8 @@ interface EventCardProps {
 const EventCard: FC<EventCardProps> = ({ eventName, shortDescription, date, location, icon, isPast, onRegisterClick }) => {
   return (
     <Card className={cn(
-      "w-full max-w-sm overflow-hidden shadow-lg transition-shadow duration-300 ease-in-out",
-      isPast ? "opacity-60 bg-muted/50 cursor-not-allowed" : "hover:shadow-xl" // Style past events
+      "w-full max-w-sm overflow-hidden shadow-lg transition-all duration-300 ease-in-out", // Added transition-all
+      isPast ? "opacity-60 bg-muted/50 cursor-not-allowed" : "hover:shadow-xl hover:-translate-y-1" // Added hover effect
     )}>
       <CardHeader className="flex flex-row items-center gap-4 p-4 bg-primary/10">
         <div className={cn("text-primary", isPast && "text-muted-foreground")}>
@@ -44,8 +45,10 @@ const EventCard: FC<EventCardProps> = ({ eventName, shortDescription, date, loca
         <Button
             variant={isPast ? "secondary" : "default"}
             className={cn(
-              "w-full",
-              isPast ? "cursor-not-allowed bg-muted text-muted-foreground" : "bg-accent text-accent-foreground hover:bg-accent/90"
+              "w-full transition-transform duration-150 ease-in-out", // Added transition classes
+              isPast
+                ? "cursor-not-allowed bg-muted text-muted-foreground"
+                : "bg-accent text-accent-foreground hover:bg-accent/90 active:scale-95" // Added active:scale-95
             )}
             onClick={onRegisterClick}
             disabled={isPast} // Disable button for past events
@@ -64,11 +67,5 @@ const EventCard: FC<EventCardProps> = ({ eventName, shortDescription, date, loca
     </Card>
   );
 };
-
-// Helper for conditional class names
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
-}
-
 
 export default EventCard;
