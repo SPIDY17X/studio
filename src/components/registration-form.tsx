@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { FC } from 'react';
@@ -16,18 +17,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerForEvent } from "@/services/event-management";
-import { Mail, Ticket } from 'lucide-react'; // Added Ticket icon
+import { Mail, Ticket, Phone } from 'lucide-react'; // Added Phone icon
 
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
+  phoneNumber: z.string().min(10, {
+    message: "Phone number must be at least 10 digits.",
+  }).regex(/^\+?[0-9\s-()]*$/, { // Basic regex for digits, optional +, spaces, hyphens, parentheses
+     message: "Please enter a valid phone number.",
+  }),
 });
 
 interface RegistrationFormProps {
   eventName: string;
-  // Update prop type to accept email on success
-  onRegistrationSuccess: (email: string) => void;
+  // Update prop type to accept email and phone number on success
+  onRegistrationSuccess: (details: { email: string; phoneNumber: string }) => void;
 }
 
 const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistrationSuccess }) => {
@@ -36,26 +42,28 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      phoneNumber: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const success = await registerForEvent(eventName, values.email);
+      // Call registerForEvent with email and phone number
+      const success = await registerForEvent(eventName, values.email, values.phoneNumber);
       if (success) {
         toast({
           title: "Registration Successful!",
           description: `Your ticket for ${eventName} is confirmed.`,
           variant: "default", // or "success" if you add a success variant
         });
-        // Call the callback *before* resetting the form to pass the email
-        onRegistrationSuccess(values.email);
+        // Call the callback with both email and phone number
+        onRegistrationSuccess({ email: values.email, phoneNumber: values.phoneNumber });
         form.reset(); // Reset form after successful registration and callback
       } else {
-        // Assuming the service returns false for duplicate or other errors like capacity
+        // Assuming the service returns false for duplicate, full, or other errors
         toast({
           title: "Registration Failed",
-          description: "This email may already be registered, the event might be full, or registration failed.",
+          description: "This email or phone number may already be registered, the event might be full, or registration failed.",
           variant: "destructive",
         });
       }
@@ -71,7 +79,7 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* Reduced space-y */}
         <FormField
           control={form.control}
           name="email"
@@ -81,14 +89,30 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
               <FormControl>
                  <div className="relative">
                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                   <Input placeholder="your.email@example.com" {...field} className="pl-10" />
+                   <Input type="email" placeholder="your.email@example.com" {...field} className="pl-10" />
                  </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground/90">Phone Number</FormLabel>
+              <FormControl>
+                 <div className="relative">
+                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                   <Input type="tel" placeholder="e.g., +1 123 456 7890" {...field} className="pl-10" />
+                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 mt-6" disabled={form.formState.isSubmitting}>
            {form.formState.isSubmitting ? 'Registering...' : (
              <>
                <Ticket className="mr-2 h-4 w-4" /> Register & Confirm Ticket

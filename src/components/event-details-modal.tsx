@@ -1,3 +1,4 @@
+
 import { FC, useState, useEffect } from 'react';
 import type { EventDetails } from '@/services/event-management';
 import {
@@ -19,19 +20,20 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, onClose }) => {
-  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  // State to hold both email and phone number after successful registration
+  const [registrationDetails, setRegistrationDetails] = useState<{ email: string; phoneNumber: string } | null>(null);
 
-  // Reset registeredEmail when the modal closes or the event changes
+  // Reset registrationDetails when the modal closes or the event changes
   useEffect(() => {
     if (!isOpen || !eventDetails) {
-      setRegisteredEmail(null);
+      setRegistrationDetails(null);
     }
   }, [isOpen, eventDetails]);
 
   if (!eventDetails) return null;
 
-  const handleRegistrationSuccess = (email: string) => {
-    setRegisteredEmail(email);
+  const handleRegistrationSuccess = (details: { email: string; phoneNumber: string }) => {
+    setRegistrationDetails(details);
     // The parent page's useEffect will handle refreshing the main event details
     // if needed (e.g., to update the attendee count display).
   };
@@ -68,11 +70,15 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
            <Separator className="my-2 bg-border/50" />
 
            {/* Registration / Ticket Section */}
-           {isEventFull && !registeredEmail ? (
+           {isEventFull && !registrationDetails ? (
              <p className="text-center font-semibold text-destructive mt-4 p-3 bg-destructive/10 rounded-md">Registration Full</p>
-           ) : registeredEmail ? (
-             // Show Ticket Confirmation if registeredEmail is set
-             <TicketConfirmation eventDetails={eventDetails} userEmail={registeredEmail} />
+           ) : registrationDetails ? (
+             // Show Ticket Confirmation if registrationDetails is set
+             <TicketConfirmation
+                eventDetails={eventDetails}
+                userEmail={registrationDetails.email}
+                userPhoneNumber={registrationDetails.phoneNumber}
+             />
            ) : (
              // Show Registration Form if not full and not yet registered in this session
              <>
