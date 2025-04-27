@@ -106,7 +106,8 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
               <FormControl>
                  <div className="relative">
                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                   <Input type="tel" placeholder="e.g., +91 98765 43210" {...field} className="pl-10" /> {/* Updated placeholder */}
+                   {/* Updated placeholder */}
+                   <Input type="tel" placeholder="e.g., +91 98XXX XXXXX" {...field} className="pl-10" />
                  </div>
               </FormControl>
               <FormMessage />
