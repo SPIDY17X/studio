@@ -126,7 +126,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-6 sm:p-12 md:p-24 bg-gradient-to-b from-blue-200 via-blue-50 to-teal-100"> {/* Updated background gradient */}
       <header className="w-full max-w-5xl mb-12 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-2">DU Events Hub</h1>
+        <h1 className="text-4xl sm:text-5xl font-bold text-accent mb-2">DU Events Hub</h1> {/* Changed text-primary to text-accent */}
         <p className="text-lg text-muted-foreground">Discover and register for exciting events at Delhi University.</p>
       </header>
 
