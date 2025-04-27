@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { FC } from 'react';
@@ -105,7 +106,7 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
               <FormControl>
                  <div className="relative">
                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                   <Input type="tel" placeholder="e.g., +1 123 456 7890" {...field} className="pl-10" />
+                   <Input type="tel" placeholder="e.g., +91 98765 43210" {...field} className="pl-10" /> {/* Updated placeholder */}
                  </div>
               </FormControl>
               <FormMessage />
