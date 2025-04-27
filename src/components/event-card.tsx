@@ -19,11 +19,11 @@ interface EventCardProps {
 const EventCard: FC<EventCardProps> = ({ eventName, shortDescription, date, location, icon, isPast, onRegisterClick }) => {
   return (
     <Card className={cn(
-      "w-full max-w-sm overflow-hidden shadow-lg transition-all duration-300 ease-in-out", // Added transition-all
-      isPast ? "opacity-60 bg-muted/50 cursor-not-allowed" : "hover:shadow-xl hover:-translate-y-1" // Added hover effect
+      "w-full max-w-sm overflow-hidden shadow-lg transition-all duration-300 ease-in-out group", // Added transition-all and group
+      isPast ? "opacity-60 bg-muted/50 cursor-not-allowed" : "hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02]" // Added hover:scale
     )}>
       <CardHeader className="flex flex-row items-center gap-4 p-4 bg-primary/10">
-        <div className={cn("text-primary", isPast && "text-muted-foreground")}>
+        <div className={cn("text-primary transition-transform duration-300 group-hover:scale-110", isPast && "text-muted-foreground group-hover:scale-100")}> {/* Added hover effect to icon */}
           {icon} {/* Render the passed icon */}
         </div>
         <div>
@@ -69,3 +69,4 @@ const EventCard: FC<EventCardProps> = ({ eventName, shortDescription, date, loca
 };
 
 export default EventCard;
+

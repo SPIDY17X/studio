@@ -13,46 +13,52 @@ interface TicketConfirmationProps {
 
 const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEmail, userPhoneNumber }) => {
   return (
-    <Card className="w-full bg-primary/5 border-accent shadow-md mt-4">
-      <CardHeader className="flex flex-row items-center gap-3 pb-3">
-        <CheckCircle className="w-7 h-7 text-green-600" />
+    // Enhanced styling: prominent border, slightly different background
+    <Card className="w-full bg-accent/5 border-2 border-accent/50 shadow-lg mt-4 rounded-lg overflow-hidden">
+      <CardHeader className="flex flex-row items-center gap-4 p-4 bg-accent/10">
+        <CheckCircle className="w-8 h-8 text-green-500 shrink-0" /> {/* Made icon slightly larger */}
         <div>
-            <CardTitle className="text-lg font-semibold text-accent">Ticket Confirmed!</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">You are registered for {eventDetails.name}.</CardDescription>
+            {/* Use accent color for title */}
+            <CardTitle className="text-xl font-bold text-accent">Ticket Confirmed!</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground">You're successfully registered for {eventDetails.name}.</CardDescription>
         </div>
       </CardHeader>
-      <Separator className="mx-6 bg-border/30"/>
-      <CardContent className="p-6 grid gap-3 text-sm">
-        <div className="flex items-center gap-3 text-foreground/90">
-           <Ticket className="w-4 h-4 text-accent" />
-           <span className="font-medium">Event:</span>
-           <span>{eventDetails.name}</span>
+      <Separator className="mx-4 bg-accent/30"/> {/* Use accent color for separator */}
+      <CardContent className="p-4 grid gap-3 text-sm">
+        <div className="flex items-start gap-3 text-foreground/90"> {/* Use items-start for potential wrapping */}
+           <Ticket className="w-4 h-4 text-accent mt-0.5 shrink-0" /> {/* Adjusted icon alignment */}
+           <span className="font-medium w-24 shrink-0">Event:</span> {/* Fixed width for label */}
+           <span className="font-semibold">{eventDetails.name}</span> {/* Made event name bold */}
         </div>
-        <div className="flex items-center gap-3 text-foreground/90">
-            <CalendarDays className="w-4 h-4 text-accent" />
-            <span className="font-medium">Date & Time:</span>
+        <div className="flex items-start gap-3 text-foreground/90">
+            <CalendarDays className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+            <span className="font-medium w-24 shrink-0">Date & Time:</span>
             <span>{new Date(eventDetails.dateTime).toLocaleString()}</span>
         </div>
-        <div className="flex items-center gap-3 text-foreground/90">
-            <MapPin className="w-4 h-4 text-accent" />
-            <span className="font-medium">Location:</span>
+        <div className="flex items-start gap-3 text-foreground/90">
+            <MapPin className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+            <span className="font-medium w-24 shrink-0">Location:</span>
             <span>{eventDetails.location}</span>
         </div>
-         <Separator className="my-2 bg-border/30"/>
-        <div className="flex items-center gap-3 text-foreground/90">
-            <Mail className="w-4 h-4 text-accent" />
-            <span className="font-medium">Registered Email:</span>
-            <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{userEmail}</span>
+         <Separator className="my-3 bg-accent/20"/> {/* Adjusted spacing and color */}
+        <div className="flex items-start gap-3 text-foreground/90">
+            <Mail className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+            <span className="font-medium w-24 shrink-0">Registered Email:</span>
+            {/* Slightly enhanced badge style */}
+            <span className="font-mono text-xs bg-accent/10 text-accent-foreground/90 px-2 py-1 rounded border border-accent/20">{userEmail}</span>
         </div>
-         <div className="flex items-center gap-3 text-foreground/90">
-            <Phone className="w-4 h-4 text-accent" />
-            <span className="font-medium">Registered Phone:</span>
-            <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{userPhoneNumber}</span>
+         <div className="flex items-start gap-3 text-foreground/90">
+            <Phone className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+            <span className="font-medium w-24 shrink-0">Registered Phone:</span>
+            <span className="font-mono text-xs bg-accent/10 text-accent-foreground/90 px-2 py-1 rounded border border-accent/20">{userPhoneNumber}</span>
         </div>
-         <p className="text-xs text-muted-foreground mt-3">Keep this confirmation for your records. You might receive an email or SMS confirmation as well (feature not implemented).</p>
+         <p className="text-xs text-muted-foreground mt-4 italic"> {/* Added italic */}
+            Please keep this confirmation for your records. A confirmation might also be sent via email/SMS (feature not implemented).
+         </p>
       </CardContent>
     </Card>
   );
 };
 
 export default TicketConfirmation;
+

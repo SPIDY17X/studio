@@ -83,8 +83,13 @@ export default function Home() {
       setIsModalOpen(false); // Close modal on error
     } finally {
       // Only set loading to false if the modal wasn't closed due to error or past date check
-       if (isModalOpen) {
+       // Check if the modal *should* still be open conceptually before setting loading false
+       const shouldStillBeOpen = isModalOpen && !(error || (selectedEventDetails && new Date(selectedEventDetails.dateTime) < new Date('2025-05-01T00:00:00Z')));
+       if (shouldStillBeOpen) {
          setIsLoadingDetails(false);
+       } else {
+          // If the modal was intentionally closed (e.g., due to past date check after fetch), ensure loading is false.
+          setIsLoadingDetails(false);
        }
     }
   };
@@ -96,9 +101,9 @@ export default function Home() {
 
   // Effect to update details if already open (e.g., after registration)
   useEffect(() => {
-    if (isModalOpen && selectedEventDetails?.name) { // Ensure there's a name to refresh
+    if (isModalOpen && selectedEventDetails?.name && !isLoadingDetails) { // Add !isLoadingDetails to prevent race condition
       const refreshDetails = async () => {
-        setIsLoadingDetails(true); // Show loading state while refreshing
+        // No need to set loading true here if we only refresh *after* initial load
         try {
             const updatedDetails = await getEventDetails(selectedEventDetails.name);
             // Only update if the modal is still open for the same event
@@ -107,32 +112,36 @@ export default function Home() {
             }
         } catch (error) {
             console.error("Failed to refresh event details:", error);
-        } finally {
-             // Only stop loading if the modal is still considered open conceptually
-             // This check prevents setting loading to false if the modal was closed
-             // *during* the fetch request.
-             if (isModalOpen && selectedEventDetails?.name) {
-                setIsLoadingDetails(false);
-             }
+             toast({ // Add toast on refresh error
+                 title: "Refresh Error",
+                 description: "Could not refresh event details.",
+                 variant: "destructive",
+              });
         }
       };
-      refreshDetails();
+      // Debounce or throttle this refresh if needed, but for now, a direct call is fine
+      // if registration success triggers a re-render or state change that runs this effect.
+       refreshDetails();
     }
     // Dependency array: re-run if modal opens/closes or if selectedEventDetails.name changes
-    // or if the number of attendees changes (indicating successful registration)
-  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees]);
+    // Adding registeredAttendees ensures refresh after successful registration shown in modal
+  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees, isLoadingDetails, toast]); // Include isLoadingDetails and toast
 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-6 sm:p-12 md:p-24 bg-gradient-to-b from-blue-200 via-blue-50 to-teal-100"> {/* Updated background gradient */}
-      <header className="w-full max-w-5xl mb-12 text-center">
-        <h1 className="text-4xl sm:text-5xl font-bold text-accent mb-2">DU Events Hub</h1> {/* Changed text-primary to text-accent */}
-        <p className="text-lg text-muted-foreground">Discover and register for exciting events at Delhi University.</p>
+    // Increased padding: p-8 sm:p-16 md:p-28
+    <main className="flex min-h-screen flex-col items-center justify-start p-8 sm:p-16 md:p-28 bg-gradient-to-b from-blue-200 via-blue-50 to-teal-100"> {/* Updated background gradient */}
+      {/* Increased header margin-bottom: mb-16 */}
+      <header className="w-full max-w-5xl mb-16 text-center">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-accent mb-3">DU Events Hub</h1> {/* Increased font size, Adjusted margin */}
+        <p className="text-lg md:text-xl text-muted-foreground">Discover and register for exciting events at Delhi University.</p> {/* Increased font size */}
       </header>
 
       <section className="w-full max-w-7xl"> {/* Increased max-width for more cards */}
-        <h2 className="text-2xl sm:text-3xl font-semibold mb-8 text-center text-foreground">Upcoming Events - 2025</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 justify-items-center"> {/* Adjusted grid columns */}
+        {/* Increased heading margin-bottom: mb-10 */}
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-10 text-center text-foreground">Upcoming Events - 2025</h2>
+        {/* Increased gap: gap-8 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 justify-items-center"> {/* Adjusted grid columns and gap */}
           {eventsList.map((event) => (
             <EventCard
               key={event.name}
@@ -148,12 +157,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Non-loading modal - pass details only when not loading and details exist */}
       <EventDetailsModal
-        isOpen={isModalOpen && !isLoadingDetails} // Only open if not loading initially
+        isOpen={isModalOpen && !isLoadingDetails && !!selectedEventDetails}
         onClose={handleCloseModal}
         eventDetails={selectedEventDetails}
       />
+
        {/* Conditional Skeleton loading state inside a Dialog */}
+       {/* Use derived state for clarity: showLoadingDialog */}
        {isModalOpen && isLoadingDetails && (
             <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
                 <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
@@ -161,22 +173,30 @@ export default function Home() {
                         {/* Add a visually hidden DialogTitle for accessibility */}
                         <DialogTitle><VisuallyHidden>Loading Event Details</VisuallyHidden></DialogTitle>
                         <Skeleton className="h-8 w-3/4 mb-2" /> {/* Simulates Title */}
-                        <Skeleton className="h-4 w-full" />     {/* Simulates Description line 1 */}
+                        <Skeleton className="h-4 w-full mb-1" />     {/* Simulates Description line 1 */}
                         <Skeleton className="h-4 w-5/6" />    {/* Simulates Description line 2 */}
                      </DialogHeader>
                       <Separator className="bg-border/50 my-4" />
                       <div className="grid gap-4">
+                            {/* Simulate detail rows */}
                             <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-1/2" /></div>
                             <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-3/4" /></div>
                             <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-1/3" /></div>
                              <Separator className="my-2 bg-border/50" />
                              {/* Simulate form area */}
-                             <Skeleton className="h-6 w-1/3 mt-4 mb-2" />
-                             <div className="relative">
+                             <Skeleton className="h-6 w-1/3 mt-4 mb-3" /> {/* Adjusted margins */}
+                             {/* Simulate Email Input */}
+                             <div className="relative mb-3"> {/* Added margin */}
                                 <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
                                 <Skeleton className="h-10 w-full pl-10" />
                              </div>
-                             <Skeleton className="h-10 w-full mt-4" />
+                             {/* Simulate Phone Input */}
+                              <div className="relative mb-4"> {/* Added margin */}
+                                <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                                <Skeleton className="h-10 w-full pl-10" />
+                             </div>
+                             {/* Simulate Button */}
+                             <Skeleton className="h-10 w-full mt-2" /> {/* Adjusted margin */}
                       </div>
                 </DialogContent>
            </Dialog>

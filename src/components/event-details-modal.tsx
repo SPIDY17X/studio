@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import RegistrationForm from './registration-form';
 import TicketConfirmation from './ticket-confirmation'; // Import the new component
-import { CalendarDays, MapPin, Users, UserPlus, Ticket } from 'lucide-react';
+import { CalendarDays, MapPin, Users, UserPlus, Ticket, AlertCircle } from 'lucide-react'; // Added AlertCircle
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Import Alert components
 
 interface EventDetailsModalProps {
   eventDetails: EventDetails | null;
@@ -39,10 +40,12 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
   };
 
   const isEventFull = eventDetails.registeredAttendees >= eventDetails.capacity;
+  const spotsLeft = eventDetails.capacity - eventDetails.registeredAttendees;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl">
+       {/* Adjust max-width for slightly wider modal */}
+      <DialogContent className="sm:max-w-md md:max-w-lg bg-card text-card-foreground rounded-lg shadow-xl">
         <DialogHeader className="p-6 pb-4">
           <DialogTitle className="text-2xl font-bold text-primary">{eventDetails.name}</DialogTitle>
           <DialogDescription className="text-base text-muted-foreground pt-1">
@@ -50,28 +53,48 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
           </DialogDescription>
         </DialogHeader>
         <Separator className="bg-border/50" />
-        <div className="p-6 grid gap-4">
-           <div className="flex items-center gap-3 text-foreground/90">
-              <CalendarDays className="w-5 h-5 text-accent" />
-              <span className="font-medium">Date & Time:</span>
-              <span>{new Date(eventDetails.dateTime).toLocaleString()}</span>
+        {/* Adjusted padding and gap */}
+        <div className="p-6 pt-4 grid gap-5">
+           {/* Use flex column for better alignment on smaller widths within the grid item */}
+           <div className="flex items-start gap-3 text-foreground/90">
+              <CalendarDays className="w-5 h-5 text-accent mt-0.5 shrink-0" /> {/* Align icon better */}
+              <div>
+                <span className="font-medium block">Date & Time:</span>
+                <span className="text-sm">{new Date(eventDetails.dateTime).toLocaleString()}</span>
+              </div>
            </div>
-           <div className="flex items-center gap-3 text-foreground/90">
-              <MapPin className="w-5 h-5 text-accent" />
-              <span className="font-medium">Location:</span>
-              <span>{eventDetails.location}</span>
+           <div className="flex items-start gap-3 text-foreground/90">
+              <MapPin className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <span className="font-medium block">Location:</span>
+                <span className="text-sm">{eventDetails.location}</span>
+              </div>
            </div>
-           <div className="flex items-center gap-3 text-foreground/90">
-              <Users className="w-5 h-5 text-accent" />
-              <span className="font-medium">Capacity:</span>
-              <span>{eventDetails.registeredAttendees} / {eventDetails.capacity}</span>
+           <div className="flex items-start gap-3 text-foreground/90">
+              <Users className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+              <div>
+                <span className="font-medium block">Capacity:</span>
+                <span className="text-sm">
+                    {eventDetails.registeredAttendees} / {eventDetails.capacity} Registered
+                    {!isEventFull && spotsLeft <= 10 && ( // Show warning if few spots left
+                        <span className="text-destructive font-semibold ml-2">({spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} left!)</span>
+                    )}
+                </span>
+              </div>
            </div>
 
            <Separator className="my-2 bg-border/50" />
 
            {/* Registration / Ticket Section */}
+           {/* Use ShadCN Alert for 'Registration Full' message */}
            {isEventFull && !registrationDetails ? (
-             <p className="text-center font-semibold text-destructive mt-4 p-3 bg-destructive/10 rounded-md">Registration Full</p>
+             <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Registration Full</AlertTitle>
+                <AlertDescription>
+                    Unfortunately, this event has reached its maximum capacity.
+                </AlertDescription>
+            </Alert>
            ) : registrationDetails ? (
              // Show Ticket Confirmation if registrationDetails is set
              <TicketConfirmation
@@ -82,9 +105,10 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
            ) : (
              // Show Registration Form if not full and not yet registered in this session
              <>
-               <div className="flex items-center gap-3 text-foreground/90 mb-2">
+               <div className="flex items-center gap-3 text-foreground/90 mb-0"> {/* Reduced mb */}
                    <UserPlus className="w-5 h-5 text-accent" />
-                   <span className="font-medium text-lg">Register for this event:</span>
+                   {/* Slightly bolder title */}
+                   <span className="font-semibold text-lg">Register for this event:</span>
                </div>
                <RegistrationForm
                  eventName={eventDetails.name}
