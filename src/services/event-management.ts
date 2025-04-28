@@ -206,7 +206,8 @@ Object.values(mockEvents).forEach(event => {
 });
 
 // Add some specific pre-registered details for testing upcoming events
-registrations['thomdos-2025'].add({ email: 'test@example.com', phoneNumber: '+11234567890' });
+registrations['thomdos-2025'].add({ email: 'test@example.com', phoneNumber: '+919876543210' });
+registrations['thomdos-2025'].add({ email: 'another@example.com', phoneNumber: '+911234567890' });
 // Bitbots is already at capacity, no need to add more here unless the mock data is changed
 
 // --- Mock API Functions ---
@@ -232,11 +233,11 @@ export async function getEventDetails(eventName: string): Promise<EventDetails> 
 }
 
 /**
- * Simulates registering a user for an event with checks for email and phone number.
+ * Simulates registering a user for an event with checks for email and phone number uniqueness per event.
  * @param eventName The name of the event.
  * @param userEmail The user's email.
  * @param userPhoneNumber The user's phone number.
- * @returns Promise resolving to true on success, false on failure (past/duplicate email/duplicate phone/full).
+ * @returns Promise resolving to true on success, false on failure (past/duplicate email/duplicate phone/mismatched pair/full).
  */
 export async function registerForEvent(
     eventName: string,
@@ -266,6 +267,7 @@ export async function registerForEvent(
         if (!registrations[eventId]) {
             registrations[eventId] = new Set(); // Initialize if not present (should be initialized above)
         }
+        const eventRegistrations = registrations[eventId];
 
         // Check for capacity (using the source data)
         if (event.registeredAttendees >= event.capacity) {
@@ -273,29 +275,46 @@ export async function registerForEvent(
           return resolve(false);
         }
 
-        // Check for duplicate registration (email or phone number)
-        const normalizedEmail = userEmail.toLowerCase();
+        // Normalize inputs
+        const normalizedEmail = userEmail.toLowerCase().trim();
         const normalizedPhone = normalizePhoneNumber(userPhoneNumber);
-        let isDuplicate = false;
 
-        registrations[eventId].forEach(existingReg => {
-            if (existingReg.email.toLowerCase() === normalizedEmail) {
-                console.log(`Registration failed for ${userEmail}/${userPhoneNumber} to ${eventName}: Email already registered.`);
-                isDuplicate = true;
-            }
-            if (normalizePhoneNumber(existingReg.phoneNumber) === normalizedPhone) {
-                console.log(`Registration failed for ${userEmail}/${userPhoneNumber} to ${eventName}: Phone number already registered.`);
-                isDuplicate = true;
+        // Check for existing registrations with this email or phone number
+        let emailExists = false;
+        let phoneExists = false;
+        let exactMatch = false;
+
+        eventRegistrations.forEach(existingReg => {
+            const existingNormalizedEmail = existingReg.email.toLowerCase().trim();
+            const existingNormalizedPhone = normalizePhoneNumber(existingReg.phoneNumber);
+
+            if (existingNormalizedEmail === normalizedEmail && existingNormalizedPhone === normalizedPhone) {
+                exactMatch = true; // Exact same registration exists
+            } else if (existingNormalizedEmail === normalizedEmail) {
+                emailExists = true; // Email exists, but with a different phone number
+            } else if (existingNormalizedPhone === normalizedPhone) {
+                phoneExists = true; // Phone number exists, but with a different email
             }
         });
 
-        if (isDuplicate) {
-          return resolve(false);
+        if (exactMatch) {
+            console.log(`Registration failed for ${userEmail}/${userPhoneNumber} to ${eventName}: Exact registration already exists.`);
+            return resolve(false);
+        }
+
+        if (emailExists) {
+             console.log(`Registration failed for ${userEmail}/${userPhoneNumber} to ${eventName}: Email '${userEmail}' is already registered with a different phone number for this event.`);
+            return resolve(false);
+        }
+
+        if (phoneExists) {
+             console.log(`Registration failed for ${userEmail}/${userPhoneNumber} to ${eventName}: Phone number '${userPhoneNumber}' is already registered with a different email for this event.`);
+            return resolve(false);
         }
 
 
-        // Simulate successful registration
-        registrations[eventId].add({ email: userEmail, phoneNumber: userPhoneNumber });
+        // If no conflicts, simulate successful registration
+        eventRegistrations.add({ email: userEmail, phoneNumber: userPhoneNumber });
 
         // Safely update the event count in the mock store
         const eventKey = Object.keys(mockEvents).find(key => mockEvents[key].id === eventId);
@@ -307,7 +326,7 @@ export async function registerForEvent(
         } else {
           console.error(`Could not find original key for event ID: ${eventId}`);
           // Rollback registration add if needed? For mock, just resolve false.
-          registrations[eventId].delete({ email: userEmail, phoneNumber: userPhoneNumber }); // Attempt rollback
+          eventRegistrations.delete({ email: userEmail, phoneNumber: userPhoneNumber }); // Attempt rollback
           resolve(false);
         }
 

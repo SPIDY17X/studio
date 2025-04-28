@@ -61,10 +61,10 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
         onRegistrationSuccess({ email: values.email, phoneNumber: values.phoneNumber });
         form.reset(); // Reset form after successful registration and callback
       } else {
-        // Assuming the service returns false for duplicate, full, or other errors
+        // Updated failure message
         toast({
           title: "Registration Failed",
-          description: "This email or phone number may already be registered, the event might be full, or registration failed.",
+          description: "This email or phone number is already registered for this event (possibly with a different pair), the event might be full, or the registration encountered an issue.",
           variant: "destructive",
         });
       }
