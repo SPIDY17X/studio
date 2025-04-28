@@ -27,7 +27,7 @@ const eventsList = [
   { name: 'Debate League', shortDescription: 'Inter-College Debate', icon: <Mic className="w-8 h-8" />, date: 'Apr 15, 2025', location: 'Conference Centre', isPast: true },
 
   // Events from May 2025 onwards (Not marked as past)
-  { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 1, 2025', location: 'Amphitheatre', isPast: false },
+  { name: 'Melody Night', shortDescription: 'Music Concert', icon: <Music className="w-8 h-8" />, date: 'May 10, 2025', location: 'Amphitheatre', isPast: false }, // Updated Date
   { name: 'Alumni Meet', shortDescription: 'Annual Alumni Gathering', icon: <GraduationCap className="w-8 h-8" />, date: 'Jun 15, 2025', location: 'University Guest House', isPast: false },
   { name: 'Career Fair', shortDescription: 'Job & Internship Fair', icon: <Briefcase className="w-8 h-8" />, date: 'Jul 10, 2025', location: 'Sports Complex', isPast: false },
   { name: 'Innovation Expo', shortDescription: 'Student Project Showcase', icon: <Lightbulb className="w-8 h-8" />, date: 'Aug 28, 2025', location: 'Convention Hall', isPast: false },

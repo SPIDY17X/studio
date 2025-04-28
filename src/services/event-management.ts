@@ -1,5 +1,4 @@
 
-
 /**
  * Represents the details of an event.
  */
@@ -113,7 +112,7 @@ const mockEvents: Record<string, EventDetails> = {
     id: 'melody-night-2025',
     name: 'Melody Night',
     description: 'An enchanting evening featuring performances by university bands and solo artists.',
-    dateTime: '2025-05-01T18:30:00Z',
+    dateTime: '2025-05-10T18:30:00Z', // Updated Date to May 10
     location: 'University Amphitheatre',
     capacity: 1000,
     registeredAttendees: 650,
