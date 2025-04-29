@@ -53,7 +53,7 @@ const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEma
             <span className="font-mono text-xs bg-accent/10 text-accent-foreground/90 px-2 py-1 rounded border border-accent/20">{userPhoneNumber}</span>
         </div>
          <p className="text-xs text-muted-foreground mt-4 italic"> {/* Added italic */}
-            Please keep this confirmation for your records. A confirmation might also be sent via email/SMS (feature not implemented).
+            Please keep this confirmation for your records.
          </p>
       </CardContent>
     </Card>
