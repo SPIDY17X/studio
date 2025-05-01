@@ -35,7 +35,7 @@ export interface EventDetails {
 /**
  * Represents a registered attendee with name, email and phone.
  */
-interface AttendeeRegistration {
+export interface AttendeeRegistration { // Exported AttendeeRegistration
   name: string;
   email: string;
   phoneNumber: string;
@@ -43,7 +43,7 @@ interface AttendeeRegistration {
 
 // --- Mock Data Store ---
 // In a real app, this would be a database or API call.
-const mockEvents: Record<string, EventDetails> = {
+export const mockEvents: Record<string, EventDetails> = { // Export mockEvents
   // --- Events Before May 2025 (Marked as full/past) ---
   LitVerse: {
     id: 'litverse-2025',
@@ -186,7 +186,7 @@ const mockEvents: Record<string, EventDetails> = {
 
 
 // Store registration details (name, email, and phone) for each event
-const registrations: Record<string, Set<AttendeeRegistration>> = {};
+const registrations: Record<string, AttendeeRegistration[]> = {}; // Changed Set to Array
 
 // Helper function to normalize phone numbers (remove spaces, hyphens, parentheses)
 const normalizePhoneNumber = (phone: string): string => {
@@ -195,11 +195,11 @@ const normalizePhoneNumber = (phone: string): string => {
 
 // Initialize registration sets and pre-populate for past events
 Object.values(mockEvents).forEach(event => {
-    registrations[event.id] = new Set();
+    registrations[event.id] = []; // Initialize as array
     // Pre-populate registrations for past events to match the capacity
     if (new Date(event.dateTime) < new Date('2025-05-01T00:00:00Z')) {
         for(let i = 0; i < event.capacity; i++) {
-            registrations[event.id].add({
+            registrations[event.id].push({ // Use push for array
                 name: `Past Attendee ${i}`, // Add past attendee name
                 email: `past-attendee-${i}@example.com`,
                 phoneNumber: `+1555000${String(i).padStart(4, '0')}` // Generate unique past phone numbers
@@ -209,10 +209,10 @@ Object.values(mockEvents).forEach(event => {
 });
 
 // Add some specific pre-registered details for testing upcoming events
-registrations['thomdos-2025'].add({ name: 'Test User', email: 'test@example.com', phoneNumber: '+919876543210' });
-registrations['thomdos-2025'].add({ name: 'Another User', email: 'another@example.com', phoneNumber: '+911234567890' });
+registrations['thomdos-2025'].push({ name: 'Test User', email: 'test@example.com', phoneNumber: '+919876543210' });
+registrations['thomdos-2025'].push({ name: 'Another User', email: 'another@example.com', phoneNumber: '+911234567890' });
 // Update attendee count for THOMDOS based on pre-registrations
-mockEvents['THOMDOS'].registeredAttendees = registrations['thomdos-2025'].size;
+mockEvents['THOMDOS'].registeredAttendees = registrations['thomdos-2025'].length; // Use length for array
 
 // Bitbots is already at capacity, no need to add more here unless the mock data is changed
 
@@ -273,7 +273,7 @@ export async function registerForEvent(
 
         const eventId = event.id;
         if (!registrations[eventId]) {
-            registrations[eventId] = new Set(); // Initialize if not present (should be initialized above)
+            registrations[eventId] = []; // Initialize if not present
         }
         const eventRegistrations = registrations[eventId];
 
@@ -288,52 +288,55 @@ export async function registerForEvent(
         const normalizedEmail = userEmail.toLowerCase().trim();
         const normalizedPhone = normalizePhoneNumber(userPhoneNumber);
 
-        // Check for existing registrations with this email or phone number
-        let emailExists = false;
-        let phoneExists = false;
-        let exactMatch = false; // Consider exact match including name now? Decided against for simplicity.
+        // Check for existing registrations with this email or phone number using find
+        const emailExists = eventRegistrations.find(existingReg => existingReg.email.toLowerCase().trim() === normalizedEmail);
+        const phoneExists = eventRegistrations.find(existingReg => normalizePhoneNumber(existingReg.phoneNumber) === normalizedPhone);
 
-        eventRegistrations.forEach(existingReg => {
-            const existingNormalizedEmail = existingReg.email.toLowerCase().trim();
-            const existingNormalizedPhone = normalizePhoneNumber(existingReg.phoneNumber);
-
-            // Check if the email or phone exists, regardless of the name
-            if (existingNormalizedEmail === normalizedEmail) {
-                emailExists = true;
-            }
-            if (existingNormalizedPhone === normalizedPhone) {
-                phoneExists = true;
-            }
-        });
 
         if (emailExists) {
              console.log(`Registration failed for ${userName} (${userEmail}/${userPhoneNumber}) to ${eventName}: Email '${userEmail}' is already registered for this event.`);
-            return resolve(false); // Simplified: Just reject if email exists
+            return resolve(false);
         }
 
         if (phoneExists) {
              console.log(`Registration failed for ${userName} (${userEmail}/${userPhoneNumber}) to ${eventName}: Phone number '${userPhoneNumber}' is already registered for this event.`);
-            return resolve(false); // Simplified: Just reject if phone exists
+            return resolve(false);
         }
 
 
         // If no conflicts, simulate successful registration
-        eventRegistrations.add({ name: normalizedName, email: userEmail, phoneNumber: userPhoneNumber });
+        eventRegistrations.push({ name: normalizedName, email: userEmail, phoneNumber: userPhoneNumber });
 
         // Safely update the event count in the mock store
         const eventKey = Object.keys(mockEvents).find(key => mockEvents[key].id === eventId);
         if (eventKey) {
+          // IMPORTANT: Create a new object reference for the update to ensure React detects changes if necessary
           const updatedEvent = { ...mockEvents[eventKey], registeredAttendees: mockEvents[eventKey].registeredAttendees + 1 };
           mockEvents[eventKey] = updatedEvent; // Update using the original key
           console.log(`Successfully registered ${normalizedName} (${userEmail}/${userPhoneNumber}) for ${eventName}. New count: ${updatedEvent.registeredAttendees}`);
           resolve(true);
         } else {
           console.error(`Could not find original key for event ID: ${eventId}`);
-          // Rollback registration add if needed? For mock, just resolve false.
-          eventRegistrations.delete({ name: normalizedName, email: userEmail, phoneNumber: userPhoneNumber }); // Attempt rollback
+          // Rollback registration add if needed?
+          registrations[eventId] = eventRegistrations.filter(reg => !(reg.name === normalizedName && reg.email === userEmail && reg.phoneNumber === userPhoneNumber)); // Attempt rollback
           resolve(false);
         }
 
       }, 700); // Simulate network delay & processing
    });
+}
+
+/**
+ * Simulates fetching all registration data.
+ * In a real app, this would be a secure endpoint accessible only by admins.
+ * @returns Promise resolving to an object where keys are event IDs and values are arrays of registrations.
+ */
+export async function getAllRegistrations(): Promise<Record<string, AttendeeRegistration[]>> {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            // Return a deep copy to prevent modification of the original data
+            const registrationsCopy = JSON.parse(JSON.stringify(registrations));
+            resolve(registrationsCopy);
+        }, 400); // Simulate short delay
+    });
 }
