@@ -10,8 +10,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, LogIn } from 'lucide-react';
 
-const ADMIN_EMAIL = "admin@gmail.com";
-const ADMIN_PASSWORD = "admin";
+const ADMIN_EMAIL = "admin@gmail.com"; // Actual admin email remains the same
+const ADMIN_PASSWORD = "admin"; // Actual admin password remains the same
 const AUTH_KEY = "isAdminLoggedIn"; // Key for localStorage
 
 export default function AdminLoginPage() {
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@gmail.com"
+                  placeholder="xyz@gmail.com" // Updated placeholder
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -86,7 +86,7 @@ export default function AdminLoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="admin"
+                  placeholder="xyz" // Updated placeholder
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
