@@ -2,13 +2,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link'; // Import Link
 import type { EventDetails } from '@/services/event-management';
 import { getEventDetails } from '@/services/event-management';
 import EventCard from '@/components/event-card';
 import EventDetailsModal from '@/components/event-details-modal';
 // Updated imports for new icons
-import { Bot, Atom, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb } from 'lucide-react'; // Removed Puzzle, added missing icons
+import { Bot, Atom, Activity, Ticket, CalendarDays, MapPin, Users, UserPlus, BookOpen, Brush, Camera, Code, Film, FlaskConical, Mic, Paintbrush, Music, GraduationCap, Briefcase, Lightbulb, UserCog } from 'lucide-react'; // Added UserCog for Admin button
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button"; // Import Button
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'; // Import DialogTitle
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast"; // Import useToast
@@ -82,14 +84,10 @@ export default function Home() {
       });
       setIsModalOpen(false); // Close modal on error
     } finally {
-      // Only set loading to false if the modal wasn't closed due to error or past date check
-       // Check if the modal *should* still be open conceptually before setting loading false
-       const shouldStillBeOpen = isModalOpen && !(error || (selectedEventDetails && new Date(selectedEventDetails.dateTime) < new Date('2025-05-01T00:00:00Z')));
-       if (shouldStillBeOpen) {
+       // Always set loading to false *if* the modal is still conceptually open
+       // This ensures the loading state is removed even if closing logic failed for some reason
+       if (isModalOpen) {
          setIsLoadingDetails(false);
-       } else {
-          // If the modal was intentionally closed (e.g., due to past date check after fetch), ensure loading is false.
-          setIsLoadingDetails(false);
        }
     }
   };
@@ -101,7 +99,8 @@ export default function Home() {
 
   // Effect to update details if already open (e.g., after registration)
   useEffect(() => {
-    if (isModalOpen && selectedEventDetails?.name && !isLoadingDetails) { // Add !isLoadingDetails to prevent race condition
+    // Only refresh if modal is open, details exist, and we are *not* currently loading
+    if (isModalOpen && selectedEventDetails?.name && !isLoadingDetails) {
       const refreshDetails = async () => {
         // No need to set loading true here if we only refresh *after* initial load
         try {
@@ -119,18 +118,26 @@ export default function Home() {
               });
         }
       };
-      // Debounce or throttle this refresh if needed, but for now, a direct call is fine
-      // if registration success triggers a re-render or state change that runs this effect.
        refreshDetails();
     }
-    // Dependency array: re-run if modal opens/closes or if selectedEventDetails.name changes
-    // Adding registeredAttendees ensures refresh after successful registration shown in modal
-  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees, isLoadingDetails, toast]); // Include isLoadingDetails and toast
+  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees, isLoadingDetails, toast]); // Dependencies ensure refresh on relevant changes
 
 
   return (
     // Increased padding: p-8 sm:p-16 md:p-28
-    <main className="flex min-h-screen flex-col items-center justify-start p-8 sm:p-16 md:p-28 bg-gradient-to-b from-blue-200 via-blue-50 to-teal-100"> {/* Updated background gradient */}
+    // Added relative positioning to allow absolute positioning of children (like the Admin button)
+    <main className="relative flex min-h-screen flex-col items-center justify-start p-8 sm:p-16 md:p-28 bg-gradient-to-br from-blue-100 via-purple-100 to-teal-100">
+      {/* Admin Button - Top Right */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 z-10">
+        <Link href="/admin/login" passHref>
+            <Button variant="outline" className="bg-card hover:bg-accent/10">
+                <UserCog className="mr-2 h-4 w-4" />
+                Admin
+            </Button>
+        </Link>
+      </div>
+
+
       {/* Increased header margin-bottom: mb-16 */}
       <header className="w-full max-w-5xl mb-16 text-center">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-accent mb-3">DU Events Hub</h1> {/* Increased font size, Adjusted margin */}
@@ -167,7 +174,8 @@ export default function Home() {
        {/* Conditional Skeleton loading state inside a Dialog */}
        {/* Use derived state for clarity: showLoadingDialog */}
        {isModalOpen && isLoadingDetails && (
-            <Dialog open={true} onOpenChange={handleCloseModal}> {/* Use handleCloseModal here */}
+            // Ensure onClose is correctly passed to handle closing the loading dialog
+            <Dialog open={true} onOpenChange={handleCloseModal}>
                 <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
                      <DialogHeader>
                         {/* Add a visually hidden DialogTitle for accessibility */}
@@ -185,6 +193,11 @@ export default function Home() {
                              <Separator className="my-2 bg-border/50" />
                              {/* Simulate form area */}
                              <Skeleton className="h-6 w-1/3 mt-4 mb-3" /> {/* Adjusted margins */}
+                              {/* Simulate Name Input */}
+                             <div className="relative mb-3">
+                                <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                                <Skeleton className="h-10 w-full pl-10" />
+                             </div>
                              {/* Simulate Email Input */}
                              <div className="relative mb-3"> {/* Added margin */}
                                 <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
