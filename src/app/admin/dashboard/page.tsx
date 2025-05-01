@@ -74,7 +74,7 @@ export default function AdminDashboardPage() {
 
   const handleLogout = () => {
     localStorage.removeItem(AUTH_KEY); // Clear login state
-    router.push('/admin/login');
+    router.push('/'); // Redirect to main home page
   };
 
   // Derived state for total registrations
