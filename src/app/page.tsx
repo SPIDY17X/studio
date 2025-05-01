@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Separator } from '@/components/ui/separator';
 import { useToast } from "@/hooks/use-toast"; // Import useToast
 import { VisuallyHidden } from '@/components/ui/visually-hidden'; // Import VisuallyHidden
+import { ScrollArea } from "@/components/ui/scroll-area"; // Import ScrollArea
 
 // Expanded events list with updated dates for June-December 2025
 // Added 'isPast' flag for events before May 2025
@@ -179,7 +180,7 @@ export default function Home() {
             // Ensure onClose is correctly passed to handle closing the loading dialog
             <Dialog open={true} onOpenChange={handleCloseModal}>
                 {/* Apply the same animation classes as the main DialogContent */}
-                <DialogContent className="sm:max-w-md md:max-w-lg bg-card text-card-foreground rounded-lg shadow-xl p-6 flex flex-col">
+                <DialogContent className="sm:max-w-md md:max-w-lg bg-card text-card-foreground rounded-lg shadow-xl p-0 flex flex-col"> {/* Changed padding to p-0 */}
                      <DialogHeader className="p-6 pb-4 shrink-0">
                         {/* Add a visually hidden DialogTitle for accessibility */}
                         <DialogTitle><VisuallyHidden>Loading Event Details</VisuallyHidden></DialogTitle>
