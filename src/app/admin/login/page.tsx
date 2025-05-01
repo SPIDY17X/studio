@@ -104,13 +104,12 @@ export default function AdminLoginPage() {
             </Button>
           </form>
         </CardContent>
-         <CardFooter className="text-xs text-muted-foreground text-center justify-center pt-4">
-            <p>Use email: admin@gmail.com & password: admin</p>
+         {/* Removed CardFooter content */}
+         <CardFooter className="pt-4">
+            {/* Footer can be empty or contain other elements if needed later */}
          </CardFooter>
       </Card>
-       <p className="mt-4 text-sm text-red-600 dark:text-red-400 font-medium">
-           Note: This login uses insecure client-side storage for demonstration purposes only.
-        </p>
+       {/* Removed insecure login warning paragraph */}
     </main>
   );
 }
