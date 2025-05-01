@@ -85,7 +85,7 @@ export default function Home() {
       });
       setIsModalOpen(false); // Close modal on error
     } finally {
-       // Always set loading to false once the fetch attempt (try/catch) is complete
+       // Always set loading false once the fetch attempt (try/catch) is complete
        setIsLoadingDetails(false);
     }
   };
@@ -132,7 +132,11 @@ export default function Home() {
       {/* Admin Button - Top Right */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 z-10">
         <Link href="/admin/login" passHref>
-            <Button variant="outline" className="bg-card hover:bg-accent/10">
+            {/* Updated Admin button style */}
+            <Button
+              variant="outline"
+              className="bg-background/80 backdrop-blur-sm border border-border hover:bg-accent hover:text-accent-foreground transition-colors duration-200 shadow-sm hover:shadow-md"
+            >
                 <UserCog className="mr-2 h-4 w-4" />
                 Admin
             </Button>
