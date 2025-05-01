@@ -1,4 +1,5 @@
 
+
 import { FC, useState, useEffect } from 'react';
 import type { EventDetails } from '@/services/event-management';
 import {
@@ -22,8 +23,8 @@ interface EventDetailsModalProps {
 }
 
 const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, onClose }) => {
-  // State to hold both email and phone number after successful registration
-  const [registrationDetails, setRegistrationDetails] = useState<{ email: string; phoneNumber: string } | null>(null);
+  // State to hold name, email, and phone number after successful registration
+  const [registrationDetails, setRegistrationDetails] = useState<{ name: string; email: string; phoneNumber: string } | null>(null);
 
   // Reset registrationDetails when the modal closes or the event changes
   useEffect(() => {
@@ -34,7 +35,7 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
 
   if (!eventDetails) return null;
 
-  const handleRegistrationSuccess = (details: { email: string; phoneNumber: string }) => {
+  const handleRegistrationSuccess = (details: { name: string; email: string; phoneNumber: string }) => {
     setRegistrationDetails(details);
     // The parent page's useEffect will handle refreshing the main event details
     // if needed (e.g., to update the attendee count display).
@@ -103,6 +104,7 @@ const EventDetailsModal: FC<EventDetailsModalProps> = ({ eventDetails, isOpen, o
                  // Show Ticket Confirmation if registrationDetails is set
                  <TicketConfirmation
                     eventDetails={eventDetails}
+                    userName={registrationDetails.name} // Pass name
                     userEmail={registrationDetails.email}
                     userPhoneNumber={registrationDetails.phoneNumber}
                  />

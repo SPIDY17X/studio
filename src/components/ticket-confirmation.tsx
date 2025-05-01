@@ -1,17 +1,19 @@
 
+
 import type { FC } from 'react';
 import type { EventDetails } from '@/services/event-management';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle, CalendarDays, MapPin, Mail, Ticket, Phone } from 'lucide-react'; // Added Phone icon
+import { CheckCircle, CalendarDays, MapPin, Mail, Ticket, Phone, User } from 'lucide-react'; // Added User icon
 import { Separator } from "@/components/ui/separator";
 
 interface TicketConfirmationProps {
   eventDetails: EventDetails;
+  userName: string; // Added name prop
   userEmail: string;
-  userPhoneNumber: string; // Added phone number prop
+  userPhoneNumber: string;
 }
 
-const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEmail, userPhoneNumber }) => {
+const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userName, userEmail, userPhoneNumber }) => {
   return (
     // Enhanced styling: prominent border, slightly different background
     <Card className="w-full bg-accent/5 border-2 border-accent/50 shadow-lg mt-4 rounded-lg overflow-hidden">
@@ -20,7 +22,7 @@ const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEma
         <div>
             {/* Use accent color for title */}
             <CardTitle className="text-xl font-bold text-accent">Ticket Confirmed!</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">You're successfully registered for {eventDetails.name}.</CardDescription>
+            <CardDescription className="text-sm text-muted-foreground">You're successfully registered for {eventDetails.name}, {userName}.</CardDescription> {/* Added name */}
         </div>
       </CardHeader>
       <Separator className="mx-4 bg-accent/30"/> {/* Use accent color for separator */}
@@ -41,6 +43,12 @@ const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEma
             <span>{eventDetails.location}</span>
         </div>
          <Separator className="my-3 bg-accent/20"/> {/* Adjusted spacing and color */}
+         <div className="flex items-start gap-3 text-foreground/90">
+            <User className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+            <span className="font-medium w-24 shrink-0">Registered Name:</span>
+            {/* Slightly enhanced badge style */}
+            <span className="font-medium text-foreground/90">{userName}</span>
+        </div>
         <div className="flex items-start gap-3 text-foreground/90">
             <Mail className="w-4 h-4 text-accent mt-0.5 shrink-0" />
             <span className="font-medium w-24 shrink-0">Registered Email:</span>
@@ -52,7 +60,7 @@ const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEma
             <span className="font-medium w-24 shrink-0">Registered Phone:</span>
             <span className="font-mono text-xs bg-accent/10 text-accent-foreground/90 px-2 py-1 rounded border border-accent/20">{userPhoneNumber}</span>
         </div>
-         <p className="text-xs text-muted-foreground mt-4 italic"> {/* Added italic */}
+         <p className="text-xs text-muted-foreground mt-4 italic">
             Please keep this confirmation for your records.
          </p>
       </CardContent>
@@ -61,4 +69,3 @@ const TicketConfirmation: FC<TicketConfirmationProps> = ({ eventDetails, userEma
 };
 
 export default TicketConfirmation;
-

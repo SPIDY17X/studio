@@ -18,9 +18,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { registerForEvent } from "@/services/event-management";
-import { Mail, Ticket, Phone } from 'lucide-react'; // Added Phone icon
+import { Mail, Ticket, Phone, User } from 'lucide-react'; // Added User icon
 
 const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
@@ -33,8 +36,8 @@ const formSchema = z.object({
 
 interface RegistrationFormProps {
   eventName: string;
-  // Update prop type to accept email and phone number on success
-  onRegistrationSuccess: (details: { email: string; phoneNumber: string }) => void;
+  // Update prop type to accept name, email, and phone number on success
+  onRegistrationSuccess: (details: { name: string; email: string; phoneNumber: string }) => void;
 }
 
 const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistrationSuccess }) => {
@@ -42,6 +45,7 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       phoneNumber: "",
     },
@@ -49,22 +53,22 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Call registerForEvent with email and phone number
-      const success = await registerForEvent(eventName, values.email, values.phoneNumber);
+      // Call registerForEvent with name, email, and phone number
+      const success = await registerForEvent(eventName, values.name, values.email, values.phoneNumber);
       if (success) {
         toast({
           title: "Registration Successful!",
           description: `Your ticket for ${eventName} is confirmed.`,
           variant: "default", // or "success" if you add a success variant
         });
-        // Call the callback with both email and phone number
-        onRegistrationSuccess({ email: values.email, phoneNumber: values.phoneNumber });
+        // Call the callback with name, email and phone number
+        onRegistrationSuccess({ name: values.name, email: values.email, phoneNumber: values.phoneNumber });
         form.reset(); // Reset form after successful registration and callback
       } else {
         // Updated failure message
         toast({
           title: "Registration Failed",
-          description: "This email or phone number is already registered for this event (possibly with a different pair), the event might be full, or the registration encountered an issue.",
+          description: "This email or phone number is already registered for this event (possibly with a different name/pair), the event might be full, or the registration encountered an issue.",
           variant: "destructive",
         });
       }
@@ -81,6 +85,22 @@ const RegistrationForm: FC<RegistrationFormProps> = ({ eventName, onRegistration
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* Reduced space-y */}
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground/90">Full Name</FormLabel>
+              <FormControl>
+                 <div className="relative">
+                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                   <Input type="text" placeholder="Enter your full name" {...field} className="pl-10" />
+                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="email"
