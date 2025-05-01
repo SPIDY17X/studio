@@ -59,6 +59,7 @@ export default function Home() {
     // If not past, proceed to fetch details and open modal
     setIsLoadingDetails(true);
     setIsModalOpen(true); // Open modal immediately to show loading state
+    setSelectedEventDetails(null); // Clear previous details while loading new ones
     try {
       const details = await getEventDetails(eventName);
       // Double-check the date from fetched details (more reliable)
@@ -71,7 +72,6 @@ export default function Home() {
               variant: "destructive",
           });
           setIsModalOpen(false); // Close modal if date check fails after fetch
-          setIsLoadingDetails(false);
           return;
       }
       setSelectedEventDetails(details);
@@ -84,17 +84,16 @@ export default function Home() {
       });
       setIsModalOpen(false); // Close modal on error
     } finally {
-       // Always set loading to false *if* the modal is still conceptually open
-       // This ensures the loading state is removed even if closing logic failed for some reason
-       if (isModalOpen) {
-         setIsLoadingDetails(false);
-       }
+       // Always set loading to false once the fetch attempt (try/catch) is complete
+       setIsLoadingDetails(false);
     }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedEventDetails(null); // Clear details when closing
+    // Optional: Set loading false here too, just in case, although finally should handle it.
+    // setIsLoadingDetails(false);
   };
 
   // Effect to update details if already open (e.g., after registration)
@@ -120,13 +119,15 @@ export default function Home() {
       };
        refreshDetails();
     }
-  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees, isLoadingDetails, toast]); // Dependencies ensure refresh on relevant changes
+    // Add selectedEventDetails.registeredAttendees to dependencies to trigger refresh after registration success
+  }, [isModalOpen, selectedEventDetails?.name, selectedEventDetails?.registeredAttendees, isLoadingDetails, toast]);
 
 
   return (
     // Increased padding: p-8 sm:p-16 md:p-28
     // Added relative positioning to allow absolute positioning of children (like the Admin button)
-    <main className="relative flex min-h-screen flex-col items-center justify-start p-8 sm:p-16 md:p-28 bg-gradient-to-br from-blue-100 via-purple-100 to-teal-100">
+    // Added gradient background
+    <main className="relative flex min-h-screen flex-col items-center justify-start p-8 sm:p-16 md:p-28 bg-gradient-to-br from-blue-100 via-purple-100 to-teal-100 dark:from-gray-900 dark:via-purple-900 dark:to-teal-950">
       {/* Admin Button - Top Right */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 md:top-8 md:right-8 z-10">
         <Link href="/admin/login" passHref>
@@ -140,7 +141,8 @@ export default function Home() {
 
       {/* Increased header margin-bottom: mb-16 */}
       <header className="w-full max-w-5xl mb-16 text-center">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-accent mb-3">DU Events Hub</h1> {/* Increased font size, Adjusted margin */}
+        {/* Changed heading color to accent */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-accent mb-3">DU Events Hub</h1>
         <p className="text-lg md:text-xl text-muted-foreground">Discover and register for exciting events at Delhi University.</p> {/* Increased font size */}
       </header>
 
@@ -176,41 +178,45 @@ export default function Home() {
        {isModalOpen && isLoadingDetails && (
             // Ensure onClose is correctly passed to handle closing the loading dialog
             <Dialog open={true} onOpenChange={handleCloseModal}>
-                <DialogContent className="sm:max-w-[525px] bg-card text-card-foreground rounded-lg shadow-xl p-6">
-                     <DialogHeader>
+                {/* Apply the same animation classes as the main DialogContent */}
+                <DialogContent className="sm:max-w-md md:max-w-lg bg-card text-card-foreground rounded-lg shadow-xl p-6 flex flex-col">
+                     <DialogHeader className="p-6 pb-4 shrink-0">
                         {/* Add a visually hidden DialogTitle for accessibility */}
                         <DialogTitle><VisuallyHidden>Loading Event Details</VisuallyHidden></DialogTitle>
                         <Skeleton className="h-8 w-3/4 mb-2" /> {/* Simulates Title */}
                         <Skeleton className="h-4 w-full mb-1" />     {/* Simulates Description line 1 */}
                         <Skeleton className="h-4 w-5/6" />    {/* Simulates Description line 2 */}
                      </DialogHeader>
-                      <Separator className="bg-border/50 my-4" />
-                      <div className="grid gap-4">
-                            {/* Simulate detail rows */}
-                            <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-1/2" /></div>
-                            <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-3/4" /></div>
-                            <div className="flex items-center gap-3"> <Skeleton className="h-5 w-5 rounded-full" /> <Skeleton className="h-4 w-1/3" /></div>
-                             <Separator className="my-2 bg-border/50" />
-                             {/* Simulate form area */}
-                             <Skeleton className="h-6 w-1/3 mt-4 mb-3" /> {/* Adjusted margins */}
-                              {/* Simulate Name Input */}
-                             <div className="relative mb-3">
-                                <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
-                                <Skeleton className="h-10 w-full pl-10" />
-                             </div>
-                             {/* Simulate Email Input */}
-                             <div className="relative mb-3"> {/* Added margin */}
-                                <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
-                                <Skeleton className="h-10 w-full pl-10" />
-                             </div>
-                             {/* Simulate Phone Input */}
-                              <div className="relative mb-4"> {/* Added margin */}
-                                <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
-                                <Skeleton className="h-10 w-full pl-10" />
-                             </div>
-                             {/* Simulate Button */}
-                             <Skeleton className="h-10 w-full mt-2" /> {/* Adjusted margin */}
-                      </div>
+                      <Separator className="bg-border/50 shrink-0" />
+                       {/* Wrap skeleton content in ScrollArea like the main modal */}
+                      <ScrollArea className="flex-grow overflow-y-auto max-h-[70vh]">
+                          <div className="p-6 pt-4 grid gap-5">
+                                {/* Simulate detail rows */}
+                                <div className="flex items-start gap-3"> <Skeleton className="h-5 w-5 rounded-full mt-0.5 shrink-0" /> <Skeleton className="h-4 w-1/2" /></div>
+                                <div className="flex items-start gap-3"> <Skeleton className="h-5 w-5 rounded-full mt-0.5 shrink-0" /> <Skeleton className="h-4 w-3/4" /></div>
+                                <div className="flex items-start gap-3"> <Skeleton className="h-5 w-5 rounded-full mt-0.5 shrink-0" /> <Skeleton className="h-4 w-1/3" /></div>
+                                 <Separator className="my-2 bg-border/50" />
+                                 {/* Simulate form area */}
+                                 <Skeleton className="h-6 w-1/3 mt-4 mb-3" /> {/* Adjusted margins */}
+                                  {/* Simulate Name Input */}
+                                 <div className="relative mb-4"> {/* Adjusted margin */}
+                                    <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                                    <Skeleton className="h-10 w-full pl-10" />
+                                 </div>
+                                 {/* Simulate Email Input */}
+                                 <div className="relative mb-4"> {/* Adjusted margin */}
+                                    <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                                    <Skeleton className="h-10 w-full pl-10" />
+                                 </div>
+                                 {/* Simulate Phone Input */}
+                                  <div className="relative mb-6"> {/* Adjusted margin */}
+                                    <Skeleton className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" />
+                                    <Skeleton className="h-10 w-full pl-10" />
+                                 </div>
+                                 {/* Simulate Button */}
+                                 <Skeleton className="h-10 w-full mt-2" /> {/* Adjusted margin */}
+                          </div>
+                      </ScrollArea>
                 </DialogContent>
            </Dialog>
       )}
