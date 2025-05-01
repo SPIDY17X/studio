@@ -153,7 +153,7 @@ export const mockEvents: Record<string, EventDetails> = { // Export mockEvents
     dateTime: '2025-09-12T10:00:00Z', // Updated date (Start of festival)
     location: 'North Campus Grounds',
     capacity: 500,
-    registeredAttendees: 252, // Added 2 from pre-registration
+    registeredAttendees: 2, // Updated count based on pre-registration below
   },
   ROBOMAP: {
     id: 'robomap-2025',
@@ -193,28 +193,103 @@ const normalizePhoneNumber = (phone: string): string => {
     return phone.replace(/[\s-()]/g, '');
 }
 
+// Generate a random 10-digit phone number string
+const generateRandomPhone = (): string => {
+    let phone = '';
+    for (let i = 0; i < 10; i++) {
+        phone += Math.floor(Math.random() * 10);
+    }
+    return phone;
+};
+
+// Sample realistic first names and last names
+const firstNames = ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai", "Reyansh", "Ayaan", "Krishna", "Ishaan", "Saanvi", "Angel", "Pari", "Ananya", "Diya", "Aadhya", "Fatima", "Myra", "Gauri", "Anika"];
+const lastNames = ["Sharma", "Verma", "Gupta", "Singh", "Kumar", "Patel", "Shah", "Khan", "Ali", "Das", "Reddy", "Joshi", "Mehta", "Desai", "Agarwal"];
+
+// Generate a random realistic name
+const generateRandomName = (): string => {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    return `${firstName} ${lastName}`;
+}
+
+
 // Initialize registration sets and pre-populate for past events
 Object.values(mockEvents).forEach(event => {
     registrations[event.id] = []; // Initialize as array
     // Pre-populate registrations for past events to match the capacity
     if (new Date(event.dateTime) < new Date('2025-05-01T00:00:00Z')) {
+        const usedEmails = new Set<string>();
+        const usedPhones = new Set<string>();
+
         for(let i = 0; i < event.capacity; i++) {
+            let name = generateRandomName();
+            let email: string;
+            let phone: string;
+
+            // Ensure unique email
+            do {
+                const emailPrefix = name.toLowerCase().replace(/\s+/g, '.') + Math.floor(Math.random() * 100);
+                email = `${emailPrefix}@gmail.com`;
+            } while (usedEmails.has(email));
+            usedEmails.add(email);
+
+             // Ensure unique phone number
+            do {
+                phone = `+91${generateRandomPhone()}`;
+            } while (usedPhones.has(phone));
+            usedPhones.add(phone);
+
+
             registrations[event.id].push({ // Use push for array
-                name: `Past Attendee ${i}`, // Add past attendee name
-                email: `past-attendee-${i}@example.com`,
-                phoneNumber: `+1555000${String(i).padStart(4, '0')}` // Generate unique past phone numbers
+                name: name,
+                email: email,
+                phoneNumber: phone
             });
         }
+         // Ensure the registeredAttendees count matches capacity for past events
+         mockEvents[event.name] = { ...event, registeredAttendees: event.capacity };
+
+    } else {
+        // For future events, ensure the attendee count is correctly initialized if needed
+         mockEvents[event.name] = { ...event, registeredAttendees: registrations[event.id]?.length || 0 };
     }
 });
 
-// Add some specific pre-registered details for testing upcoming events
-registrations['thomdos-2025'].push({ name: 'Test User', email: 'test@example.com', phoneNumber: '+919876543210' });
-registrations['thomdos-2025'].push({ name: 'Another User', email: 'another@example.com', phoneNumber: '+911234567890' });
+// Add some specific pre-registered details for testing upcoming events with updated format
+registrations['thomdos-2025'].push({ name: 'Priya Singh', email: 'priya.singh@gmail.com', phoneNumber: '+919876543210' });
+registrations['thomdos-2025'].push({ name: 'Rahul Kumar', email: 'rahul.kumar@gmail.com', phoneNumber: '+911234567890' });
 // Update attendee count for THOMDOS based on pre-registrations
 mockEvents['THOMDOS'].registeredAttendees = registrations['thomdos-2025'].length; // Use length for array
 
-// Bitbots is already at capacity, no need to add more here unless the mock data is changed
+// Pre-populate BITBOTS to capacity with realistic data
+if (registrations['bitbots-2025'].length < mockEvents['BITBOTS'].capacity) {
+    const usedEmailsBitbots = new Set(registrations['bitbots-2025'].map(r => r.email));
+    const usedPhonesBitbots = new Set(registrations['bitbots-2025'].map(r => r.phoneNumber));
+    const needed = mockEvents['BITBOTS'].capacity - registrations['bitbots-2025'].length;
+
+    for (let i = 0; i < needed; i++) {
+         let name = generateRandomName();
+         let email: string;
+         let phone: string;
+
+         // Ensure unique email
+         do {
+             const emailPrefix = name.toLowerCase().replace(/\s+/g, '.') + Math.floor(Math.random() * 100);
+             email = `${emailPrefix}@gmail.com`;
+         } while (usedEmailsBitbots.has(email));
+         usedEmailsBitbots.add(email);
+
+         // Ensure unique phone number
+         do {
+             phone = `+91${generateRandomPhone()}`;
+         } while (usedPhonesBitbots.has(phone));
+         usedPhonesBitbots.add(phone);
+
+        registrations['bitbots-2025'].push({ name, email, phoneNumber: phone });
+    }
+     mockEvents['BITBOTS'].registeredAttendees = mockEvents['BITBOTS'].capacity;
+}
 
 // --- Mock API Functions ---
 
